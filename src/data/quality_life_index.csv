@@ -1,0 +1,192 @@
+Rank,Nome,Index,Sust,Cost
+1,Sweden,87.2,Very high,Very high
+2,Finland,85.9,Very high,Very high
+3,Denmark,84.2,Very high,Very high
+4,Canada,83.2,Very high,Very high
+5,Germany,83.2,Very high,Very high
+6,Netherlands,83.1,Very high,Very high
+7,New Zealand,82.6,Very high,Very high
+8,United Kingdom,82.1,Very high,Very high
+9,Spain,81.5,Very high,High
+10,Austria,81.2,Very high,Very high
+11,Ireland,80.9,Very high,Very high
+12,Portugal,80.1,Very high,High
+13,France,79.5,Very high,Very high
+14,Norway,79.4,Very high,Very high
+15,Andorra,79,Very high,High
+16,Australia,78.9,Very high,Very high
+17,Slovenia,78.8,Very high,High
+18,San Marino,78.4,Very high,High
+19,Luxembourg,78.2,High,Very high
+20,Iceland,78.1,Very high,Very high
+21,Czech Republic,78,Very high,High
+22,Chile,78,Very high,High
+23,United States,77.4,Very high,Very high
+24,Belgium,77.1,Very high,Very high
+25,Uruguay,76.8,High,High
+26,Italy,76.3,Very high,Very high
+27,Costa Rica,75.8,Very high,High
+28,Japan,75.8,Very high,Very high
+29,Poland,75.5,Very high,Medium
+30,"Taiwan, Province of China",75.2,Very high,High
+31,Argentina,74.9,High,Medium
+32,Estonia,74.7,Very high,High
+33,Slovakia,74.6,Very high,High
+34,Cyprus,74.5,Very high,High
+35,Brazil,74,High,Low
+36,Lithuania,73.9,Very high,Medium
+37,Malta,73.5,Very high,Very high
+38,Romania,72.9,Very high,Medium
+39,Liechtenstein,72.6,Very high,Very high
+40,"Korea, Republic of",72.3,Very high,Very high
+41,Switzerland,72.1,Very high,Very high
+42,Latvia,71.8,Very high,High
+43,Palau,71.5,Very high,High
+44,Croatia,70.1,Very high,High
+45,Greece,69.9,High,High
+46,"Moldova, Republic of",69,Very high,Low
+47,Tuvalu,68.9,High,High
+48,Monaco,68.8,Very high,Very high
+49,Hungary,68.7,Very high,Medium
+50,Kosovo,68.5,High,Low
+51,Marshall Islands,68.4,High,High
+52,Albania,68.2,High,Medium
+53,Tonga,67.9,High,High
+54,Bulgaria,67.8,Very high,Medium
+55,Colombia,67.4,High,Low
+56,Paraguay,67.3,Medium,Low
+57,Mexico,67.2,High,Low
+58,Samoa,67,High,High
+59,Ecuador,66.9,High,Medium
+60,Tunisia,66.8,High,Low
+61,Jamaica,66.7,Medium,High
+62,Serbia,65.9,Very high,Medium
+63,Peru,65.9,High,Low
+64,Dominica,65.8,High,Very high
+65,Armenia,65.7,High,Low
+66,Mauritius,65.7,Medium,High
+67,Nauru,65.7,High,High
+68,Panama,65.7,High,High
+69,Suriname,65.5,Medium,High
+71,Ukraine,65,High,Low
+72,Dominican Republic,64.9,High,Medium
+73,El Salvador,64.7,High,Medium
+74,Trinidad and Tobago,64.5,Medium,High
+76,"Bolivia, Plurinational State of",64.4,High,Low
+77,Belize,64.3,Medium,High
+78,Antigua and Barbuda,64,High,Very high
+79,Barbados,63.8,Medium,Very high
+80,Ghana,63.8,Medium,Medium
+81,Bahamas,63.6,High,Very high
+82,Israel,63.2,Very high,Very high
+84,Kiribati,63.1,Medium,High
+85,"Macedonia, the Former Yugoslav Republic of",62.5,High,Low
+86,Georgia,62.2,High,Low
+87,Grenada,62.2,High,Very high
+88,"Micronesia, Federated States of",62.1,Medium,High
+89,Philippines,61.7,Medium,Medium
+90,Nepal,61.3,Medium,Low
+91,South Africa,61.3,Medium,Medium
+92,Kyrgyzstan,61,High,Low
+93,Mongolia,60.9,Medium,Low
+94,Fiji,60.6,High,High
+95,Bosnia and Herzegovina,60.6,High,Medium
+96,Algeria,60.6,High,Low
+97,Morocco,60.6,High,Low
+98,Bhutan,60.1,High,Medium
+100,Belarus,59.9,Very high,Low
+101,Montenegro,59.7,High,Medium
+102,Sri Lanka,59.4,Medium,Low
+103,Namibia,59.1,Low,Medium
+104,Malaysia,59.1,High,Medium
+105,Kazakhstan,58.6,High,Low
+106,Solomon Islands,58.4,Medium,High
+107,Cape Verde,58.2,Medium,Very high
+108,Brunei Darussalam,57.8,Medium,High
+109,Vanuatu,57.6,Low,High
+110,Indonesia,57.6,Medium,Medium
+111,Timor-Leste,57.5,Medium,High
+112,Uzbekistan,57.5,High,Low
+113,Viet Nam,57.4,High,Medium
+114,Hong Kong,57.4,Very high,Very high
+115,Nicaragua,57.3,Medium,Medium
+116,Azerbaijan,56.9,High,Low
+117,Seychelles,56.8,Medium,Very high
+118,Benin,56.8,Low,Low
+119,Guyana,56.5,Low,High
+120,Senegal,56.3,Low,High
+121,Bangladesh,56.1,Medium,Low
+122,Honduras,55.9,Medium,Medium
+123,Thailand,55.9,Very high,High
+124,United Arab Emirates,55.9,High,High
+125,Botswana,55.7,Low,Medium
+126,Turkey,55.6,High,Low
+127,Oman,55.3,High,High
+128,Russian Federation,55.2,High,Low
+129,Kuwait,54.9,Medium,High
+130,Singapore,54.9,Medium,Very high
+131,India,54.8,Medium,Low
+132,Cuba,54.7,High,High
+133,Libya,54.5,Medium,Low
+134,Burkina Faso,54.3,Low,Medium
+135,Tajikistan,54.1,High,Low
+136,Kenya,54,Low,Low
+137,China,53.7,High,Medium
+138,Bahrain,53.3,Medium,High
+139,"Iran, Islamic Republic of",53,High,Medium
+140,Sao Tome and Principe,52.9,Medium,Very high
+141,Guatemala,52.2,Low,Medium
+142,Saudi Arabia,51.9,Medium,High
+143,Egypt,51.2,Medium,Low
+144,Jordan,51.1,Medium,High
+145,Côte d'Ivoire,50,Low,High
+146,Qatar,49.6,Medium,High
+147,"Venezuela, Bolivarian Republic of",49.6,Medium,Medium
+148,Niger,49.3,Low,Low
+149,Gambia,49.3,Low,Medium
+150,Sierra Leone,49.3,Low,Medium
+151,Maldives,49,Medium,Very high
+152,Nigeria,49,Low,Low
+153,Pakistan,48.9,Low,Low
+154,Lesotho,48.8,Low,Low
+155,Iraq,48.5,Medium,Low
+156,Zambia,48.5,Low,Low
+157,Lebanon,48,Medium,Very high
+158,Mozambique,47.7,Low,Low
+159,Malawi,47.7,Low,High
+160,Comoros,47.5,Low,Low
+161,Gabon,47.2,Medium,High
+162,Myanmar,47,Medium,Medium
+163,Lao People's Democratic Republic,46.9,Medium,Medium
+164,Uganda,46.3,Low,Low
+165,Guinea,46.2,Low,Medium
+166,Rwanda,46.2,Low,Low
+168,Madagascar,46,Low,Low
+169,Mali,46,Low,Medium
+170,Cambodia,45.9,Medium,Medium
+171,Mauritania,45.6,Low,Medium
+172,Togo,45.3,Low,Medium
+173,Zimbabwe,44.7,Low,High
+174,Cameroon,44.7,Low,Medium
+175,"Tanzania, United Republic of",44.3,Low,Low
+176,Guinea-Bissau,43.3,Low,Medium
+177,Papua New Guinea,43.2,Low,Very high
+178,"Congo, the Democratic Republic of the",43.1,Low,Low
+179,Syrian Arab Republic,42.6,Low,Low
+180,Swaziland,40.4,Low,Medium
+181,Ethiopia,39.7,Low,High
+182,Burundi,38.6,Low,Low
+183,Afghanistan,38.1,Low,Low
+184,Equatorial Guinea,37.9,Medium,Very high
+185,Sudan,37,Low,Medium
+186,Liberia,36.8,Low,Very high
+187,Turkmenistan,36.7,Medium,Very high
+188,Angola,36.4,Low,Very high
+189,Chad,35.8,Low,Medium
+190,Congo,35.6,Low,Very high
+191,Haiti,34.8,Low,Very high
+192,Djibouti,34.7,Low,Very high
+193,Eritrea,34.6,Low,Medium
+194,Yemen,34.3,Low,High
+195,Somalia,33.6,Low,Medium
+196,Central African Republic,29.9,Low,Medium
