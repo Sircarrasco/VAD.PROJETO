@@ -28,7 +28,7 @@ Rank,Nome,Index,Sust,Cost
 27,Costa Rica,75.8,Very high,High
 28,Japan,75.8,Very high,Very high
 29,Poland,75.5,Very high,Medium
-30,"Taiwan, Province of China",75.2,Very high,High
+30,Taiwan,75.2,Very high,High
 31,Argentina,74.9,High,Medium
 32,Estonia,74.7,Very high,High
 33,Slovakia,74.6,Very high,High
@@ -38,17 +38,17 @@ Rank,Nome,Index,Sust,Cost
 37,Malta,73.5,Very high,Very high
 38,Romania,72.9,Very high,Medium
 39,Liechtenstein,72.6,Very high,Very high
-40,"Korea, Republic of",72.3,Very high,Very high
+40,South Korea,72.3,Very high,Very high
 41,Switzerland,72.1,Very high,Very high
 42,Latvia,71.8,Very high,High
 43,Palau,71.5,Very high,High
 44,Croatia,70.1,Very high,High
 45,Greece,69.9,High,High
-46,"Moldova, Republic of",69,Very high,Low
+46,Moldova,69,Very high,Low
 47,Tuvalu,68.9,High,High
 48,Monaco,68.8,Very high,Very high
 49,Hungary,68.7,Very high,Medium
-50,Kosovo,68.5,High,Low
+50,Kosovo (Disputed Territory),68.5,High,Low
 51,Marshall Islands,68.4,High,High
 52,Albania,68.2,High,Medium
 53,Tonga,67.9,High,High
@@ -72,7 +72,7 @@ Rank,Nome,Index,Sust,Cost
 72,Dominican Republic,64.9,High,Medium
 73,El Salvador,64.7,High,Medium
 74,Trinidad and Tobago,64.5,Medium,High
-76,"Bolivia, Plurinational State of",64.4,High,Low
+76,Bolivia,64.4,High,Low
 77,Belize,64.3,Medium,High
 78,Antigua and Barbuda,64,High,Very high
 79,Barbados,63.8,Medium,Very high
@@ -80,7 +80,7 @@ Rank,Nome,Index,Sust,Cost
 81,Bahamas,63.6,High,Very high
 82,Israel,63.2,Very high,Very high
 84,Kiribati,63.1,Medium,High
-85,"Macedonia, the Former Yugoslav Republic of",62.5,High,Low
+85,North Macedonia,62.5,High,Low
 86,Georgia,62.2,High,Low
 87,Grenada,62.2,High,Very high
 88,"Micronesia, Federated States of",62.1,Medium,High
@@ -102,12 +102,12 @@ Rank,Nome,Index,Sust,Cost
 105,Kazakhstan,58.6,High,Low
 106,Solomon Islands,58.4,Medium,High
 107,Cape Verde,58.2,Medium,Very high
-108,Brunei Darussalam,57.8,Medium,High
+108,Brunei,57.8,Medium,High
 109,Vanuatu,57.6,Low,High
 110,Indonesia,57.6,Medium,Medium
 111,Timor-Leste,57.5,Medium,High
 112,Uzbekistan,57.5,High,Low
-113,Viet Nam,57.4,High,Medium
+113,Vietnam,57.4,High,Medium
 114,Hong Kong,57.4,Very high,Very high
 115,Nicaragua,57.3,Medium,Medium
 116,Azerbaijan,56.9,High,Low
@@ -122,7 +122,7 @@ Rank,Nome,Index,Sust,Cost
 125,Botswana,55.7,Low,Medium
 126,Turkey,55.6,High,Low
 127,Oman,55.3,High,High
-128,Russian Federation,55.2,High,Low
+128,Russia,55.2,High,Low
 129,Kuwait,54.9,Medium,High
 130,Singapore,54.9,Medium,Very high
 131,India,54.8,Medium,Low
@@ -133,15 +133,15 @@ Rank,Nome,Index,Sust,Cost
 136,Kenya,54,Low,Low
 137,China,53.7,High,Medium
 138,Bahrain,53.3,Medium,High
-139,"Iran, Islamic Republic of",53,High,Medium
+139,Iran,53,High,Medium
 140,Sao Tome and Principe,52.9,Medium,Very high
 141,Guatemala,52.2,Low,Medium
 142,Saudi Arabia,51.9,Medium,High
 143,Egypt,51.2,Medium,Low
 144,Jordan,51.1,Medium,High
-145,Côte d'Ivoire,50,Low,High
+145,Ivory Coast,50,Low,High
 146,Qatar,49.6,Medium,High
-147,"Venezuela, Bolivarian Republic of",49.6,Medium,Medium
+147,Venezuela,49.6,Medium,Medium
 148,Niger,49.3,Low,Low
 149,Gambia,49.3,Low,Medium
 150,Sierra Leone,49.3,Low,Medium
@@ -157,7 +157,7 @@ Rank,Nome,Index,Sust,Cost
 160,Comoros,47.5,Low,Low
 161,Gabon,47.2,Medium,High
 162,Myanmar,47,Medium,Medium
-163,Lao People's Democratic Republic,46.9,Medium,Medium
+163,Laos,46.9,Medium,Medium
 164,Uganda,46.3,Low,Low
 165,Guinea,46.2,Low,Medium
 166,Rwanda,46.2,Low,Low
@@ -168,11 +168,11 @@ Rank,Nome,Index,Sust,Cost
 172,Togo,45.3,Low,Medium
 173,Zimbabwe,44.7,Low,High
 174,Cameroon,44.7,Low,Medium
-175,"Tanzania, United Republic of",44.3,Low,Low
+175,Tanzania,44.3,Low,Low
 176,Guinea-Bissau,43.3,Low,Medium
 177,Papua New Guinea,43.2,Low,Very high
 178,"Congo, the Democratic Republic of the",43.1,Low,Low
-179,Syrian Arab Republic,42.6,Low,Low
+179,Syria,42.6,Low,Low
 180,Swaziland,40.4,Low,Medium
 181,Ethiopia,39.7,Low,High
 182,Burundi,38.6,Low,Low
