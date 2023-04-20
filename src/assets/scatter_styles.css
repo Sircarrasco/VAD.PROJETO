@@ -1,0 +1,31 @@
+.scatter_plot {
+    display: flex;
+    width: 1000px;
+    height: 500px;
+}
+#scatter_horizontal {
+    display: flex;
+    justify-content: center ;
+}
+
+#y_variable {
+    width: 200px;
+    /* padding-top: 300px; */
+    /* margin-right: -5%; */
+    transform: rotate(-90deg);
+}
+
+#scatter_vertical{
+    display: flex;
+    flex-direction:column;
+    align-items: center;
+    width: 950px;
+}
+
+#x_variable {
+    width : 200px;
+}
+
+#variables_scatter {
+    width: 800px;
+}
