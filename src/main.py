@@ -7,6 +7,8 @@ import pandas as pd
 import numpy as np
 import dash
 import plotly.express as px
+from sklearn.preprocessing import LabelEncoder
+
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 
@@ -97,11 +99,47 @@ def side_menu(country):
     # filters button clicked?
     children=[
             html.Button('Reset', id='filters-selected', n_clicks=0),
-            html.Div(id='filters-info')
-    ]
-    # if country:
-    #     # country selected
-    #     graphs_info = html.Div(
+            html.Div(id='filters-info'),
+            dcc.Graph(id='cost_by_continent'),
+            html.Div(
+                className="scatter_plot",
+                children=[
+                    html.Div(
+                        id='scatter_horizontal',
+                        children=[
+                        html.Div(
+                            id = 'scatter_vertical',
+                            children = [
+                                dcc.Graph(id='variables_scatter'),
+                                dcc.Dropdown(
+                                    id = 'x_variable',
+                                    options = [{'label' : l, 'value': v} 
+                                                for l, v in zip(
+                                                    ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
+                                                    ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
+                                    value = 'quality_of_life',
+                                    clearable=False
+
+                                ),
+                            ]
+                        ),
+                        dcc.Dropdown(
+                            id = 'y_variable',
+                            options = [{'label' : l, 'value': v} 
+                                        for l, v in zip(
+                                            ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
+                                            ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
+                            value = 'safety_index',
+                            clearable=False
+                            ),
+                        ]),
+                            
+                        ]
+                    )
+                ]
+                # if country:
+                #     # country selected
+                #     graphs_info = html.Div(
     #         #Country info
 
     #     )
@@ -248,6 +286,63 @@ def map_filter(button1_clicks, button2_clicks,button3_clicks, button4_clicks, bu
 
     return fig
 
+@app.callback(
+    Output('cost_by_continent', 'figure'),
+    [Input('intermediate-value', 'data'), Input('map_variable', 'value')]
+)
+def display_average_by_country(json_data, map_variable):
+    data = pd.read_json(json_data, orient='split')
+
+    continent_data = data.groupby('continent').mean(numeric_only=True).reset_index()
+
+    fig = go.Figure(
+        data = go.Bar(
+            x = continent_data['continent'],
+            y = continent_data[map_variable]
+        )
+        )
+
+    fig.update_layout(
+        title = dict(
+                text=f'Average per continent',
+                font=dict(size=30),
+                x=0.5
+            )
+        )
+    return fig
+
+@app.callback(
+    Output('variables_scatter', 'figure'),
+    [Input('y_variable', 'value'), Input('x_variable', 'value'), Input('intermediate-value', 'data')]
+)
+def display_scatter(y_var, x_var, json_data):
+    df = pd.read_json(json_data, orient='split')
+    labels = ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties']
+    variables = ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props']
+    labels_map = {}
+    for l, v in zip(labels, variables):
+        labels_map[v] = l
+    continent_colors = LabelEncoder().fit_transform(df['continent'])
+    fig = go.Figure(
+        data= go.Scatter(
+            y = df[y_var],
+            x = df[x_var],
+            text = df['country'],
+            mode ='markers',
+            # marker_color = continent_colors
+            # marker_size=df['total_population'],
+            # marker_max_size=20
+        ),
+    )
+    fig.update_layout(
+        title = dict(
+                text=f'{labels_map[y_var]} - {labels_map[x_var]}',
+                # font=dict(size=24, weight='bold'),
+                x=0.5,
+                
+            )
+     )
+    return fig
 
 
 if __name__ == '__main__':
