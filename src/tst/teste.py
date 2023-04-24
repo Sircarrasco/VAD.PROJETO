@@ -8,6 +8,9 @@ import os
 import dash_leaflet as dl
 import plotly.express as px
 import dash
+import plotly.offline as po
+import plotly.graph_objs as pg
+import matplotlib.pyplot as plt
 
 path = os.path.join('..', 'data', 'teste.csv')
 data = pd.read_csv(path)
@@ -40,6 +43,7 @@ app.layout = html.Div(
                 html.Div("Right column",style={"background-color": "black"}),
                 dcc.Graph(id="table"),
                 ], width=3),
+                html.Div(id='output')
         ]
     )
     
@@ -126,6 +130,7 @@ def map_filter(button1_clicks, button2_clicks,button3_clicks, button4_clicks, bu
     else:
         data_filter = "average_cost_rich"
     
+    """
     # Create a Plotly world map with country codes
     fig = px.choropleth(data_frame      = aux_data,
                         locations       = 'code',
@@ -143,7 +148,26 @@ def map_filter(button1_clicks, button2_clicks,button3_clicks, button4_clicks, bu
     )
     # Disable hover effects
     fig.data[0].hovertemplate = None
+    """
+    d = dict(
+    type='choropleth',
+    locations = aux_data['code'],
+    z=aux_data[data_filter],
+    text=aux_data['country'],
+    colorscale=["white",'orange']   
+    )
 
+    layout = dict(
+                title = 'Meal, Inexpensive Restaurant (USD)',
+                geo=dict(
+                scope=aux_scope
+            )
+                
+                )
+    x = pg.Figure(data = [d], 
+                layout = layout)
+
+    #po.iplot(x)
     #fig.show()
     lista = aux_data[["country",data_filter]].nlargest(5,data_filter).reset_index(drop=True)
     lista.index = lista.index + 1
@@ -166,7 +190,18 @@ def map_filter(button1_clicks, button2_clicks,button3_clicks, button4_clicks, bu
     fig2.update_layout(width=500, height=400)
 
     print("lista: ",lista.index.tolist())
-    return fig, fig2
+    return x, fig2
 
+@app.callback(
+    Output('output', 'children'),
+    [Input('graph', 'clickData')]
+)
+def display_click_data(clickData):
+    if clickData is not None:
+        country = clickData['points'][0]['text']
+        return f'You clicked on {country}'
+    else:
+        return 'Click on a country to see information'
+    
 if __name__ == "__main__":
     app.run_server(debug=True)
