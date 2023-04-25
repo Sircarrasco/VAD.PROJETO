@@ -48,7 +48,6 @@ app.layout = html.Div(
     [Input('y_variable', 'value'), Input('x_variable', 'value'),]
 )
 def display_scatter(y_var, x_var):
-
     labels = ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties']
     variables = ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props']
     labels_map = {}

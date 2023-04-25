@@ -1,9 +1,16 @@
 .filter_item {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size: small;
+    padding: -20px;
     
 }
 
 .filter_sec {
     font-weight: bolder;
+    margin-bottom: -3px;
+}
+
+.graph {
+    width: 500px;
+    background-color: gainsboro;
 }

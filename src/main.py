@@ -11,6 +11,7 @@ from sklearn.preprocessing import LabelEncoder
 
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+app.config.suppress_callback_exceptions=True
 
 app.layout = html.Div(
     className = 'main_page',
@@ -157,17 +158,13 @@ def side_menu(country):
     Input('filters-selected', 'n_clicks')
 )
 def show_filters(n_clicks):
-    if n_clicks % 2 == 1:
-        display = 'block'
-    else:
-        display = 'none'
     display='block'
     content = html.Div(
         children=[
             html.Div(
                 className='filter_item',
                 children=[
-                    html.P('Security Index'),
+                    html.P('Security Index', className='filter_sec'),
                     dcc.RangeSlider(
                         min=0, max=100,
                         value = [0, 100],
@@ -178,7 +175,7 @@ def show_filters(n_clicks):
             html.Div(
                 className='filter_item',
                 children=[
-                    html.P('Quality Index'),
+                    html.P('Quality Index', className='filter_sec'),
                     dcc.RangeSlider(
                         min=0, max=100,
                         value = [0, 100],
@@ -189,7 +186,7 @@ def show_filters(n_clicks):
             html.Div(
                 className ='filter_item',
                 children=[
-                    html.P('No. of UNESCO properties'),
+                    html.P('No. UNESCO properties', className='filter_sec'),
                     dcc.RangeSlider(
                         min=0, max=60,
                         value = [0, 60],
