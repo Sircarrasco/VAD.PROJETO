@@ -75,8 +75,8 @@ app.layout = html.Div(
 
 
 @app.callback(Output('intermediate-value', 'data'), 
-              [Input('unesco_props', 'value'), Input('quality_index', 'value'), Input('security_index', 'value')])
-def filter_data(unesco_props, quality_index, security_index):
+              [Input('unesco_props', 'value'), Input('quality_index', 'value'), Input('security_index', 'value'), Input('total_population', 'value'), Input('GDP', 'value')])
+def filter_data(unesco_props, quality_index, security_index, total_population, gdp):
     path = os.path.join('data', 'dataset_alpha.csv')
     data = pd.read_csv(path)
     # define costs
@@ -88,7 +88,9 @@ def filter_data(unesco_props, quality_index, security_index):
     filtered_data = data.loc[
         (data.safety_index >= security_index[0]) & (data.safety_index <= security_index[1]) &
         (data.quality_of_life >= quality_index[0]) & (data.quality_of_life <= quality_index[1]) &
-        (data.unesco_props >= unesco_props[0]) & (data.unesco_props <= unesco_props[1])
+        (data.unesco_props >= unesco_props[0]) & (data.unesco_props <= unesco_props[1]) & 
+        (data.total_population >= total_population[0]) & (data.total_population <= total_population[1]) &
+        (data.GDP >= gdp[0]) & (data.GDP <= gdp[1])
         # TODO: add cost
     ]
     return filtered_data.to_json(date_format='iso', orient='split')
@@ -193,6 +195,28 @@ def show_filters(n_clicks):
                         min=0, max=60,
                         value = [0, 60],
                         id = 'unesco_props'
+                    ),
+                ]
+            ),
+            html.Div(
+            className ='filter_item',
+            children=[
+                html.P('GDP',className='filter_sec'),
+                dcc.RangeSlider(
+                    min=0.04, max=17420,
+                    value = [0.04, 17420],
+                    id = 'GDP'
+                    ),
+                ]
+            ),
+            html.Div(
+                className ='filter_item',
+                children=[
+                    html.P('Population',className='filter_sec'),
+                    dcc.RangeSlider(
+                        min=1.120400e+04, max=1.412360e+09,
+                        value = [1.120400e+04, 1.412360e+09],
+                        id = 'total_population'
                     ),
                 ]
             ),
@@ -306,8 +330,10 @@ def display_average_by_country(json_data, map_variable):
                 text=f'Average per continent',
                 font=dict(size=30),
                 x=0.5
-            )
-        )
+            ),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)"
+    )
     return fig
 
 @app.callback(
@@ -339,7 +365,9 @@ def display_scatter(y_var, x_var, json_data):
                 # font=dict(size=24, weight='bold'),
                 x=0.5,
                 
-            )
+            ),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)"
      )
     return fig
 
