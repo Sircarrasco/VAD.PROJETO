@@ -8,10 +8,11 @@ import numpy as np
 import dash
 import plotly.express as px
 from sklearn.preprocessing import LabelEncoder
-
+import plotly.graph_objs as pg
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.config.suppress_callback_exceptions=True
+app.config.prevent_initial_callbacks = 'initial_duplicate'
 
 app.layout = html.Div(
     className = 'main_page',
@@ -52,6 +53,7 @@ app.layout = html.Div(
                         ),
 
                         dcc.Graph(id="map-graph"),
+                        html.Div(id='output')
                         ]
                     
                 ),
@@ -263,25 +265,25 @@ def map_filter(button1_clicks, button2_clicks,button3_clicks, button4_clicks, bu
         aux_scope = "world"
 
     
-    # Create a Plotly world map with country codes
-    fig = px.choropleth(data_frame      = aux_data,
-                        locations       = 'code',
-                        locationmode    = 'ISO-3',
-                        color_continuous_scale=['white', 'orange'], # Set color
-                        color           = map_variable,
-                        scope           = aux_scope,
-                        )
-
-    fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-
-    # Disable legend
-    fig.update_layout(
-        showlegend=True
+    d = dict(
+    type='choropleth',
+    locations = aux_data['code'],
+    z=aux_data[map_variable],
+    text=aux_data['country'],
+    colorscale=["white",'orange']   
     )
-    # Disable hover effects
-    fig.data[0].hovertemplate = None
 
-    return fig
+    layout = dict(
+                title = 'Meal, Inexpensive Restaurant (USD)',
+                geo=dict(
+                scope=aux_scope
+            )
+                
+                )
+    x = pg.Figure(data = [d], 
+                layout = layout)
+
+    return x
 
 @app.callback(
     Output('cost_by_continent', 'figure'),
@@ -341,6 +343,154 @@ def display_scatter(y_var, x_var, json_data):
      )
     return fig
 
+@app.callback(
+    Output('side_menu', 'children'),
+    [Input('map-graph', 'clickData'),
+     Input('side_menu', 'style')]
+)
+def display_click_data(clickData,content):
+    if clickData is not None :
+        country = clickData['points'][0]['text']
+        print("deu?")
+        #!
+        path = os.path.join('data', 'dataset_alpha.csv')
+        data = pd.read_csv(path)
+        country_data = data[data.country == country]
+        pop_columns = [col for col in country_data.columns if col.startswith('pop_') and not col.endswith('%')]
+        pop_data = country_data[pop_columns].T.reset_index()
+        pop_data.columns = ['type_pop', 'percentage']
+        pop_data['gender'] = ''
+        pop_data['age-range'] = ''
+        for index, desc in enumerate(pop_data['type_pop']):
+            if 'female' in desc:
+                pop_data.loc[index, 'gender'] = 'Female'
+                pop_data.loc[index, 'percentage'] = pop_data.loc[index, 'percentage'] * country_data['female_population'].values[0] / 100
 
+            else:
+                pop_data.loc[index, 'gender'] = 'Male'
+                pop_data.loc[index, 'percentage'] = pop_data.loc[index, 'percentage'] * country_data['male_population'].values[0] / 100
+
+
+            if '0_14' in desc:
+                pop_data.loc[index, 'age-range'] = '0-14'
+            elif '15_64' in desc:
+                pop_data.loc[index, 'age-range'] = '15-64'
+
+            else:
+                pop_data.loc[index, 'age-range'] = '65+'
+
+
+        
+        fig = go.Figure(
+            data=[
+            go.Bar(name='Female', x=pop_data.loc[pop_data.gender == 'Female', 'age-range'], y=pop_data.loc[pop_data.gender == 'Female', 'percentage']),
+            go.Bar(name='Male', x=pop_data.loc[pop_data.gender == 'Male', 'age-range'], y=pop_data.loc[pop_data.gender == 'Male', 'percentage'])
+            ]
+        )
+        fig.update_layout(
+            title=dict(
+                text = 'Distribution of the population',
+                x = 0.5
+            )
+        )
+        fig.update_xaxes(
+            title_text = 'Age'
+        )
+        fig.update_yaxes(
+            title_text = 'Percentage of the population',
+        )
+        data = data.loc[data.country == country]
+        
+        #country = 'Portugal'
+        country_data = data[data.country == country]
+
+        meals = [1, 2, 3]
+        market = [23, 25, 24, 27]
+        transports = [28, 30, 33]
+        internet = [37, 38]
+        habitation = [48, 49]
+
+        meals = [f'x{m}' for m in meals]
+        market = [f'x{m}' for m in market]
+        transports = [f'x{m}' for m in transports]
+        internet = [f'x{m}' for m in internet]
+        habitation = [f'x{m}' for m in habitation]
+
+        costs = {
+        'Meals' : ((country_data['x1'] + country_data['x2']/2 + country_data['x3']) / 3).values[0] * 2,
+        'Market' : country_data[market].mean(axis=0).values[0],
+        'Transports' : country_data[transports].mean(axis=0).values[0] * 3,
+        'Telecommunications' : country_data[internet].mean(axis=0).values[0],
+        'Accomodation' : country_data[habitation].mean(axis=0).values[0] / 30.437
+        }
+
+        values = list(costs.values())
+        names = list(costs.keys())
+
+        fig2 = go.Figure(
+            go.Pie(
+                labels = names,
+                values = values
+            )
+        )
+
+        fig2.update_layout(
+            title = dict(
+                text = '% of each cost for the total value',
+                x = 0.5
+            )
+        )
+
+        children=[
+            html.Div(country),
+            dcc.Graph(id='population_plot', figure = fig),
+            dcc.Graph(id='population_plot2', figure = fig2),
+            dbc.Button("Back", className="me-1 w-5", id="back"),
+                ]
+    
+        return html.Div(children=children)
+    else:
+        children=[
+            html.Button('Reset', id='filters-selected', n_clicks=0),
+            html.Div(id='filters-info'),
+            dcc.Graph(id='cost_by_continent'),
+            html.Div(
+                className="scatter_plot",
+                children=[
+                    html.Div(
+                        id='scatter_horizontal',
+                        children=[
+                        html.Div(
+                            id = 'scatter_vertical',
+                            children = [
+                                dcc.Graph(id='variables_scatter'),
+                                dcc.Dropdown(
+                                    id = 'x_variable',
+                                    options = [{'label' : l, 'value': v} 
+                                                for l, v in zip(
+                                                    ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
+                                                    ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
+                                    value = 'quality_of_life',
+                                    clearable=False
+
+                                ),
+                            ]
+                        ),
+                        dcc.Dropdown(
+                            id = 'y_variable',
+                            options = [{'label' : l, 'value': v} 
+                                        for l, v in zip(
+                                            ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
+                                            ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
+                            value = 'safety_index',
+                            clearable=False
+                            ),
+                        ]),
+                            
+                        ]
+                    )
+                ]
+    return html.Div(children=children)
+    
 if __name__ == '__main__':
     app.run_server(debug=True)
