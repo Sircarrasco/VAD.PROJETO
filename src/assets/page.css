@@ -1,3 +1,13 @@
 #side_menu {
     background-color: gainsboro;
 }
+
+#map_variable {
+    width: 25%;
+    margin: "auto";
+}
+#map_var_container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

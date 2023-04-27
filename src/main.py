@@ -55,7 +55,6 @@ app.layout = html.Div(
                         ),
 
                         dcc.Graph(id="map-graph"),
-                        html.Div(id='output')
                         ]
                     
                 ),
@@ -238,30 +237,25 @@ def show_filters(n_clicks):
     Input('continent2', 'n_clicks'),
     Input('continent3', 'n_clicks'),
     Input('continent4', 'n_clicks'),
-    Input('continent5', 'n_clicks')],
-
-    [Input('continent1', 'value'),
+    Input('continent5', 'n_clicks'),
+    Input('continent1', 'value'),
     Input('continent2', 'value'),
     Input('continent3', 'value'),
     Input('continent4', 'value'),
-    Input('continent5', 'value')],
+    Input('continent5', 'value'),
     Input('intermediate-value', 'data'), 
     Input('map_variable', 'value'),
-    Input("button_value",'data')
+    Input("button_value",'data')]
     )
 
 # function to show world map with filters 
-def map_filter(button1_clicks, button2_clicks,button3_clicks, button4_clicks, button5_clicks, button1_value, button2_value, button3_value, button4_value, button5_value, json_data, map_variable, button_variable):
-
+def map_view(button1_clicks, button2_clicks,button3_clicks, button4_clicks, button5_clicks, button1_value, button2_value, button3_value, button4_value, button5_value, json_data, map_variable, button_variable):
     data = pd.read_json(json_data, orient='split')
-
     if button1_clicks is None and button2_clicks is None and button3_clicks is None and button4_clicks is None and button5_clicks is None:
         country = "World"
-
     else:
         ctx = dash.callback_context
         button_id = ctx.triggered[0]['prop_id'].split('.')[0]
-
         if button_id == 'continent1':
             #print(button1_value)
             country = button1_value
@@ -280,7 +274,6 @@ def map_filter(button1_clicks, button2_clicks,button3_clicks, button4_clicks, bu
         else:
             country = button_variable["country"]
 
-    print("estou a ver: ",country)
     if country == "Asia":
         aux_data = data[data["continent"] == country]
         aux_scope = "asia"
@@ -300,26 +293,42 @@ def map_filter(button1_clicks, button2_clicks,button3_clicks, button4_clicks, bu
         aux_data = data
         aux_scope = "world"
 
-    print("tamanho aux: ",len(aux_data))
-    d = dict(
-    type='choropleth',
-    locations = aux_data['code'],
-    z=aux_data[map_variable],
-    text=aux_data['country'],
-    colorscale=["white",'orange']   
+    
+    # d = dict(
+    #     type='choropleth',
+    #     locations = aux_data['code'],
+    #     z=aux_data[map_variable],
+    #     text=aux_data['country'],
+    #     colorscale=["white",'orange'],
+    # )
+    # # print(map_var_title)
+    # layout = dict(
+    #     # title = map_var_title,
+    #     geo=dict(
+    #         scope=aux_scope
+    #         ),
+    #     # width = '90%'
+    # )
+    # fig = pg.Figure(data = [d], 
+    #             layout = layout)
+    fig = px.choropleth(data_frame      = aux_data,
+                        locations       = 'code',
+                        locationmode    = 'ISO-3',
+                        color_continuous_scale=['white', 'orange'], # Set color
+                        color           = map_variable,
+                        scope           = aux_scope,
+                        hover_name      = 'country'
+                        )
+
+    fig.update_layout(
+        showlegend=True,
+        margin={"r":0,"t":0,"l":0,"b":0},
+        plot_bgcolor ='white',
     )
-
-    layout = dict(
-                title = '',
-                geo=dict(
-                scope=aux_scope
-            )
-                
-                )
-    x = pg.Figure(data = [d], 
-                layout = layout)
-
-    return x, {"country": country}
+    # Disable hover effects
+    fig.data[0].hovertemplate = None
+    
+    return fig, {"country": country}
 
 @app.callback(
     Output('cost_by_continent', 'figure'),
@@ -393,8 +402,6 @@ def display_click_data(clickData,content):
     
     if clickData is not None :
         country = clickData['points'][0]['text']
-        print("cliquei no mapa")
-        #!
         path = os.path.join('data', 'dataset_alpha.csv')
         data = pd.read_csv(path)
         country_data = data[data.country == country]
@@ -433,7 +440,9 @@ def display_click_data(clickData,content):
             title=dict(
                 text = 'Distribution of the population',
                 x = 0.5
-            )
+            ),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)"
         )
         fig.update_xaxes(
             title_text = 'Age'
@@ -480,7 +489,9 @@ def display_click_data(clickData,content):
             title = dict(
                 text = '% of each cost for the total value',
                 x = 0.5
-            )
+            ),
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)"
         )
 
         children=[
