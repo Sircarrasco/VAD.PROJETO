@@ -1,5 +1,6 @@
 from dash import Dash, dcc, html
 from dash.dependencies import Input, Output
+from dash_extensions.enrich import MultiplexerTransform
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
 import os
@@ -13,6 +14,7 @@ import plotly.graph_objs as pg
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.config.suppress_callback_exceptions=True
 app.config.prevent_initial_callbacks = 'initial_duplicate'
+
 
 app.layout = html.Div(
     className = 'main_page',
@@ -69,6 +71,7 @@ app.layout = html.Div(
                 )
             ]
         )),
+        dbc.Button("Back", className="me-1 w-5", id="back", style = {"display": "none"}, value = "no"),
         dcc.Store(id='intermediate-value')
     ]
 )
@@ -372,14 +375,16 @@ def display_scatter(y_var, x_var, json_data):
     return fig
 
 @app.callback(
-    Output('side_menu', 'children'),
-    [Input('map-graph', 'clickData'),
-     Input('side_menu', 'style')]
+    Output('side_menu', 'children' , allow_duplicate=True),
+    Output('back','style', allow_duplicate=True),
+    Input('map-graph', 'clickData'),
+    Input('side_menu', 'style')
 )
 def display_click_data(clickData,content):
+    
     if clickData is not None :
         country = clickData['points'][0]['text']
-        print("deu?")
+        print("cliquei no mapa")
         #!
         path = os.path.join('data', 'dataset_alpha.csv')
         data = pd.read_csv(path)
@@ -472,11 +477,10 @@ def display_click_data(clickData,content):
         children=[
             html.Div(country),
             dcc.Graph(id='population_plot', figure = fig),
-            dcc.Graph(id='population_plot2', figure = fig2),
-            dbc.Button("Back", className="me-1 w-5", id="back"),
+            dcc.Graph(id='population_plot2', figure = fig2)
                 ]
     
-        return html.Div(children=children)
+        return html.Div(children=children),{'display': 'block'}
     else:
         children=[
             html.Button('Reset', id='filters-selected', n_clicks=0),
@@ -518,7 +522,54 @@ def display_click_data(clickData,content):
                         ]
                     )
                 ]
-    return html.Div(children=children)
+    return html.Div(children=children), {'display': 'none'}
     
+@app.callback(
+    Output('side_menu', 'children'),
+    Output('back','style'),
+    Input('back', 'n_clicks'))
+def back_callback(back):
+
+    children=[
+            html.Button('Reset', id='filters-selected', n_clicks=0),
+            html.Div(id='filters-info'),
+            dcc.Graph(id='cost_by_continent'),
+            html.Div(
+                className="scatter_plot",
+                children=[
+                    html.Div(
+                        id='scatter_horizontal',
+                        children=[
+                        html.Div(
+                            id = 'scatter_vertical',
+                            children = [
+                                dcc.Graph(id='variables_scatter'),
+                                dcc.Dropdown(
+                                    id = 'x_variable',
+                                    options = [{'label' : l, 'value': v} 
+                                                for l, v in zip(
+                                                    ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
+                                                    ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
+                                    value = 'quality_of_life',
+                                    clearable=False
+
+                                ),
+                            ]
+                        ),
+                        dcc.Dropdown(
+                            id = 'y_variable',
+                            options = [{'label' : l, 'value': v} 
+                                        for l, v in zip(
+                                            ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
+                                            ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
+                            value = 'safety_index',
+                            clearable=False
+                            ),
+                        ]),
+                            
+                        ]
+                    )
+                ]
+    return html.Div(children=children), {'display': 'none'} 
 if __name__ == '__main__':
     app.run_server(debug=True)
