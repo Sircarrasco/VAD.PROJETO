@@ -72,7 +72,8 @@ app.layout = html.Div(
             ]
         )),
         dbc.Button("Back", className="me-1 w-5", id="back", style = {"display": "none"}, value = "no"),
-        dcc.Store(id='intermediate-value')
+        dcc.Store(id='intermediate-value'),
+        dcc.Store(id='button_value')
     ]
 )
 
@@ -232,7 +233,7 @@ def show_filters(n_clicks):
 
 @app.callback(
     Output("map-graph", "figure"),
-
+    Output("button_value",'data'),
     [Input('continent1', 'n_clicks'),
     Input('continent2', 'n_clicks'),
     Input('continent3', 'n_clicks'),
@@ -245,17 +246,22 @@ def show_filters(n_clicks):
     Input('continent4', 'value'),
     Input('continent5', 'value')],
     Input('intermediate-value', 'data'), 
-    Input('map_variable', 'value')
+    Input('map_variable', 'value'),
+    Input("button_value",'data')
     )
 
 # function to show world map with filters 
-def map_filter(button1_clicks, button2_clicks,button3_clicks, button4_clicks, button5_clicks, button1_value, button2_value, button3_value, button4_value, button5_value, json_data, map_variable):
+def map_filter(button1_clicks, button2_clicks,button3_clicks, button4_clicks, button5_clicks, button1_value, button2_value, button3_value, button4_value, button5_value, json_data, map_variable, button_variable):
+
     data = pd.read_json(json_data, orient='split')
+
     if button1_clicks is None and button2_clicks is None and button3_clicks is None and button4_clicks is None and button5_clicks is None:
         country = "World"
+
     else:
         ctx = dash.callback_context
         button_id = ctx.triggered[0]['prop_id'].split('.')[0]
+
         if button_id == 'continent1':
             #print(button1_value)
             country = button1_value
@@ -271,7 +277,10 @@ def map_filter(button1_clicks, button2_clicks,button3_clicks, button4_clicks, bu
         elif button_id == 'continent5':
             #print(button5_value)
             country = button5_value
+        else:
+            country = button_variable["country"]
 
+    print("estou a ver: ",country)
     if country == "Asia":
         aux_data = data[data["continent"] == country]
         aux_scope = "asia"
@@ -291,7 +300,7 @@ def map_filter(button1_clicks, button2_clicks,button3_clicks, button4_clicks, bu
         aux_data = data
         aux_scope = "world"
 
-    
+    print("tamanho aux: ",len(aux_data))
     d = dict(
     type='choropleth',
     locations = aux_data['code'],
@@ -301,7 +310,7 @@ def map_filter(button1_clicks, button2_clicks,button3_clicks, button4_clicks, bu
     )
 
     layout = dict(
-                title = 'Meal, Inexpensive Restaurant (USD)',
+                title = '',
                 geo=dict(
                 scope=aux_scope
             )
@@ -310,7 +319,7 @@ def map_filter(button1_clicks, button2_clicks,button3_clicks, button4_clicks, bu
     x = pg.Figure(data = [d], 
                 layout = layout)
 
-    return x
+    return x, {"country": country}
 
 @app.callback(
     Output('cost_by_continent', 'figure'),
