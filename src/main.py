@@ -55,6 +55,7 @@ app.layout = html.Div(
                         ),
 
                         dcc.Graph(id="map-graph"),
+                        dcc.RangeSlider(min=62, max=2256.08, step=150, value=[62 ,2256.08], id='map_slider')
                         ]
                     
                 ),
@@ -77,7 +78,7 @@ app.layout = html.Div(
 )
 
 
-@app.callback(Output('intermediate-value', 'data'), 
+@app.callback(Output('intermediate-value', 'data', allow_duplicate=True), 
               [Input('unesco_props', 'value'), Input('quality_index', 'value'), Input('security_index', 'value'), Input('total_population', 'value'), Input('GDP', 'value')])
 def filter_data(unesco_props, quality_index, security_index, total_population, gdp):
     path = os.path.join('data', 'dataset_alpha.csv')
@@ -245,11 +246,12 @@ def show_filters(n_clicks):
     Input('continent5', 'value'),
     Input('intermediate-value', 'data'), 
     Input('map_variable', 'value'),
-    Input("button_value",'data')]
+    Input("button_value",'data'),
+    Input("map_slider",'value')]
     )
 
 # function to show world map with filters 
-def map_view(button1_clicks, button2_clicks,button3_clicks, button4_clicks, button5_clicks, button1_value, button2_value, button3_value, button4_value, button5_value, json_data, map_variable, button_variable):
+def map_view(button1_clicks, button2_clicks,button3_clicks, button4_clicks, button5_clicks, button1_value, button2_value, button3_value, button4_value, button5_value, json_data, map_variable, button_variable,map_slider):
     data = pd.read_json(json_data, orient='split')
     if button1_clicks is None and button2_clicks is None and button3_clicks is None and button4_clicks is None and button5_clicks is None:
         country = "World"
@@ -311,6 +313,13 @@ def map_view(button1_clicks, button2_clicks,button3_clicks, button4_clicks, butt
     # )
     # fig = pg.Figure(data = [d], 
     #             layout = layout)
+
+    data['average_cost_rich'] = 2 * data.x2 + data.x24 + data.x48 + data.x30 + 60 * data.x37 + data.x38 + data.x6 + data.x23
+    data['average_cost_medium'] = 2 * data.x3 + data.x4 + data.x49 + data.x28 + 30 * data.x37 + data.x38 + data.x6 + data.x23
+    data['average_cost_lower'] = 2 * data.x1 + data.x49 + data.x8 + 10 * data.x37 + data.x23
+
+    aux_data = aux_data.loc[ (aux_data[map_variable] <= map_slider[1]) & (aux_data[map_variable] >= map_slider[0])]
+
     fig = px.choropleth(data_frame      = aux_data,
                         locations       = 'code',
                         locationmode    = 'ISO-3',
@@ -324,10 +333,20 @@ def map_view(button1_clicks, button2_clicks,button3_clicks, button4_clicks, butt
         showlegend=True,
         margin={"r":0,"t":0,"l":0,"b":0},
         plot_bgcolor ='white',
+        coloraxis_colorbar=dict(
+        orientation='h',
+        yanchor='bottom',
+        y=-0.5,
+        xanchor='center',
+        x=0.5,
+        lenmode='fraction',
+        len=0.5,
+        ticks='outside'
+    )
     )
     # Disable hover effects
     fig.data[0].hovertemplate = None
-    
+
     return fig, {"country": country}
 
 @app.callback(
@@ -401,7 +420,8 @@ def display_scatter(y_var, x_var, json_data):
 def display_click_data(clickData,content):
     
     if clickData is not None :
-        country = clickData['points'][0]['text']
+        print(clickData['points'][0]['hovertext'])
+        country = clickData['points'][0]['hovertext']
         path = os.path.join('data', 'dataset_alpha.csv')
         data = pd.read_csv(path)
         country_data = data[data.country == country]
@@ -545,7 +565,7 @@ def display_click_data(clickData,content):
     return html.Div(children=children), {'display': 'none'}
     
 @app.callback(
-    Output('side_menu', 'children'),
+    Output('side_menu', 'children', allow_duplicate=True),  
     Output('back','style'),
     Input('back', 'n_clicks'))
 def back_callback(back):
@@ -591,5 +611,27 @@ def back_callback(back):
                     )
                 ]
     return html.Div(children=children), {'display': 'none'} 
+
+# callback to update slider
+
+@app.callback(
+    Output('map_slider', 'min'),
+    Output('map_slider', 'max'),
+    Output('map_slider', 'value'),
+    Output('map_slider', 'step'),
+    Input('map_variable','value'))
+def back_callback(value):
+    path = os.path.join('data', 'dataset_alpha.csv')
+    data = pd.read_csv(path)
+    data['average_cost_rich'] = 2 * data.x2 + data.x24 + data.x48 + data.x30 + 60 * data.x37 + data.x38 + data.x6 + data.x23
+    data['average_cost_medium'] = 2 * data.x3 + data.x4 + data.x49 + data.x28 + 30 * data.x37 + data.x38 + data.x6 + data.x23
+    data['average_cost_lower'] = 2 * data.x1 + data.x49 + data.x8 + 10 * data.x37 + data.x23
+    
+    min = data[value].min()
+    max = data[value].max()
+
+    return min, max, [min,max], max//10
+    
+
 if __name__ == '__main__':
     app.run_server(debug=True)
