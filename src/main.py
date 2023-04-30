@@ -114,37 +114,35 @@ def side_menu(country):
                 className="scatter_plot",
                 children=[
                     html.Div(
-                        id='scatter_horizontal',
-                        children=[
-                        html.Div(
-                            id = 'scatter_vertical',
-                            children = [
-                                dcc.Graph(id='variables_scatter'),
-                                dcc.Dropdown(
-                                    id = 'x_variable',
-                                    options = [{'label' : l, 'value': v} 
-                                                for l, v in zip(
-                                                    ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
-                                                    ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
-                                    value = 'quality_of_life',
-                                    clearable=False
-
-                                ),
-                            ]
-                        ),
-                        dcc.Dropdown(
-                            id = 'y_variable',
-                            options = [{'label' : l, 'value': v} 
-                                        for l, v in zip(
-                                            ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
-                                            ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
-                            value = 'safety_index',
-                            clearable=False
+                        dcc.Graph(id='variables_scatter'),
+                    ),
+                    html.Div(
+                        id='scatter_vars',
+                        children = [
+                            dcc.Dropdown(
+                                id = 'x_variable',
+                                options = [{'label' : l, 'value': v} 
+                                            for l, v in zip(
+                                                ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
+                                                ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
+                                value = 'quality_of_life',
+                                clearable=False
                             ),
-                        ]),
-                            
+                            html.P('VS'),
+                            dcc.Dropdown(
+                                id = 'y_variable',
+                                options = [{'label' : l, 'value': v} 
+                                            for l, v in zip(
+                                                ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
+                                                ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
+                                value = 'safety_index',
+                                clearable=False
+                            )
                         ]
-                    )
+                    ),
+                            
+                ])
+                            
                 ]
                 # if country:
                 #     # country selected
@@ -400,22 +398,29 @@ def display_scatter(y_var, x_var, json_data):
         ),
     )
     fig.update_layout(
-        title = dict(
-                text=f'{labels_map[y_var]} - {labels_map[x_var]}',
-                # font=dict(size=24, weight='bold'),
-                x=0.5,
+        # title = dict(
+        #         text=f'{labels_map[y_var]} - {labels_map[x_var]}',
+        #         # font=dict(size=24, weight='bold'),
+        #         x=0.5,
                 
-            ),
+        #     ),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)"
      )
+    fig.update_xaxes(
+        title_text= labels_map[x_var]
+    )
+    fig.update_yaxes(
+        title_text= labels_map[y_var]
+    )
     return fig
 
 @app.callback(
     Output('side_menu', 'children' , allow_duplicate=True),
     Output('back','style', allow_duplicate=True),
     Input('map-graph', 'clickData'),
-    Input('side_menu', 'style')
+    Input('side_menu', 'style'),
+    
 )
 def display_click_data(clickData,content):
     
@@ -470,7 +475,6 @@ def display_click_data(clickData,content):
         fig.update_yaxes(
             title_text = 'Percentage of the population',
         )
-        data = data.loc[data.country == country]
         
         #country = 'Portugal'
         country_data = data[data.country == country]
@@ -515,10 +519,10 @@ def display_click_data(clickData,content):
         )
 
         children=[
-            html.Div(country),
+            html.H1(country),
             dcc.Graph(id='population_plot', figure = fig),
             dcc.Graph(id='population_plot2', figure = fig2)
-                ]
+            ]
     
         return html.Div(children=children),{'display': 'block'}
     else:
@@ -530,38 +534,35 @@ def display_click_data(clickData,content):
                 className="scatter_plot",
                 children=[
                     html.Div(
-                        id='scatter_horizontal',
-                        children=[
-                        html.Div(
-                            id = 'scatter_vertical',
-                            children = [
-                                dcc.Graph(id='variables_scatter'),
-                                dcc.Dropdown(
-                                    id = 'x_variable',
-                                    options = [{'label' : l, 'value': v} 
-                                                for l, v in zip(
-                                                    ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
-                                                    ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
-                                    value = 'quality_of_life',
-                                    clearable=False
-
-                                ),
-                            ]
-                        ),
-                        dcc.Dropdown(
-                            id = 'y_variable',
-                            options = [{'label' : l, 'value': v} 
-                                        for l, v in zip(
-                                            ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
-                                            ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
-                            value = 'safety_index',
-                            clearable=False
+                        dcc.Graph(id='variables_scatter'),
+                    ),
+                    html.Div(
+                        id='scatter_vars',
+                        children = [
+                            dcc.Dropdown(
+                                id = 'x_variable',
+                                options = [{'label' : l, 'value': v} 
+                                            for l, v in zip(
+                                                ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
+                                                ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
+                                value = 'quality_of_life',
+                                clearable=False
                             ),
-                        ]),
-                            
+                            html.P('VS'),
+                            dcc.Dropdown(
+                                id = 'y_variable',
+                                options = [{'label' : l, 'value': v} 
+                                            for l, v in zip(
+                                                ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
+                                                ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
+                                value = 'safety_index',
+                                clearable=False
+                            )
                         ]
-                    )
-                ]
+                    ),
+                            
+                ])
+            ]
     return html.Div(children=children), {'display': 'none'}
     
 @app.callback(
@@ -569,7 +570,7 @@ def display_click_data(clickData,content):
     Output('back','style'),
     Input('back', 'n_clicks'))
 def back_callback(back):
-
+    print('here')
     children=[
             html.Button('Reset', id='filters-selected', n_clicks=0),
             html.Div(id='filters-info'),
@@ -578,38 +579,35 @@ def back_callback(back):
                 className="scatter_plot",
                 children=[
                     html.Div(
-                        id='scatter_horizontal',
-                        children=[
-                        html.Div(
-                            id = 'scatter_vertical',
-                            children = [
-                                dcc.Graph(id='variables_scatter'),
-                                dcc.Dropdown(
-                                    id = 'x_variable',
-                                    options = [{'label' : l, 'value': v} 
-                                                for l, v in zip(
-                                                    ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
-                                                    ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
-                                    value = 'quality_of_life',
-                                    clearable=False
-
-                                ),
-                            ]
-                        ),
-                        dcc.Dropdown(
-                            id = 'y_variable',
-                            options = [{'label' : l, 'value': v} 
-                                        for l, v in zip(
-                                            ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
-                                            ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
-                            value = 'safety_index',
-                            clearable=False
+                        dcc.Graph(id='variables_scatter'),
+                    ),
+                    html.Div(
+                        id='scatter_vars',
+                        children = [
+                            dcc.Dropdown(
+                                id = 'x_variable',
+                                options = [{'label' : l, 'value': v} 
+                                            for l, v in zip(
+                                                ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
+                                                ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
+                                value = 'quality_of_life',
+                                clearable=False
                             ),
-                        ]),
-                            
+                            html.P('VS'),
+                            dcc.Dropdown(
+                                id = 'y_variable',
+                                options = [{'label' : l, 'value': v} 
+                                            for l, v in zip(
+                                                ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
+                                                ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
+                                value = 'safety_index',
+                                clearable=False
+                            )
                         ]
-                    )
-                ]
+                    ),
+                            
+                ])
+            ]
     return html.Div(children=children), {'display': 'none'} 
 
 # callback to update slider

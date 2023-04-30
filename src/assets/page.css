@@ -11,3 +11,11 @@
     justify-content: center;
     align-items: center;
 }
+
+.country_info_item {
+    font-family:Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 12;
+    font-weight: 600;
+    margin-top: 0;
+    margin-bottom: 0;
+}

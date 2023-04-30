@@ -1,17 +1,19 @@
 .scatter_plot {
     display: flex;
+    align-items: center;
+    flex-direction: column-reverse;
+
     /* width: 400px; */
 }
+
 #scatter_horizontal {
     display: flex;
     justify-content: center ;
 }
 
 #y_variable {
+    padding-left: 10px;
     width: 200px;
-    padding-top: 90px;
-    /* margin-right: -5%; */
-    transform: rotate(-90deg);
 }
 
 #scatter_vertical{
@@ -23,12 +25,15 @@
 
 #x_variable {
     width : 200px;
+    padding-right: 10px;
 }
 
-/* #variables_scatter {
-    width: 800px;
-} */
-
+#scatter_vars {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 #variables_scatter {
+    margin-top: -80px;
     width: 500px;
 }
