@@ -453,8 +453,11 @@ def display_click_data(clickData,content):
             else:
                 pop_data.loc[index, 'age-range'] = '65+'
 
+        data['average_cost_rich'] = 2 * data.x2 + data.x24 + data.x48 + data.x30 + 60 * data.x37 + data.x38 + data.x6 + data.x23
+        data['average_cost_medium'] = 2 * data.x3 + data.x4 + data.x49 + data.x28 + 30 * data.x37 + data.x38 + data.x6 + data.x23
+        data['average_cost_lower'] = 2 * data.x1 + data.x49 + data.x8 + 10 * data.x37 + data.x23
+        data['cost_average'] = data[['average_cost_rich', 'average_cost_medium', 'average_cost_lower']].mean(axis=1)
 
-        
         fig = go.Figure(
             data=[
             go.Bar(name='Female', x=pop_data.loc[pop_data.gender == 'Female', 'age-range'], y=pop_data.loc[pop_data.gender == 'Female', 'percentage']),
@@ -517,9 +520,23 @@ def display_click_data(clickData,content):
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)"
         )
+        print('get graphs')
+        quality_of_index = get_info_graph(data, country, 'quality_of_life', 'Quality of life', [0, 100], '%')
+        security_index = get_info_graph(data, country, 'safety_index', 'Security Index', [0, 100], '%')
+        gdp = get_info_graph(data, country, 'GDP', 'GDP', [0, 20000], 'Billions US $')
+        cost = get_info_graph(data, country, 'cost_average', 'Daily Cost', [data['cost_average'].min(), data['cost_average'].max()], 'US $')
+    
 
         children=[
             html.H1(country),
+            html.P(children='Daily Cost', className='country_info_item'),
+            dcc.Graph(figure=cost),
+            html.P(children='QUALITY OF LIFE', className='country_info_item'),
+            dcc.Graph(figure=quality_of_index),
+            html.P('SECURITY INDEX', className='country_info_item'),
+            dcc.Graph(figure=security_index),
+            html.P('GDP', className='country_info_item'),
+            dcc.Graph(figure=gdp),
             dcc.Graph(id='population_plot', figure = fig),
             dcc.Graph(id='population_plot2', figure = fig2)
             ]
@@ -564,7 +581,40 @@ def display_click_data(clickData,content):
                 ])
             ]
     return html.Div(children=children), {'display': 'none'}
+
+
+def get_info_graph(data, country, variable, display_name, ticks_range, ticks_name):
     
+    value = data.loc[data.country == country, variable].values[0]
+    fig = go.Figure(
+        data=[
+            go.Histogram(x=data[variable])
+        ]
+    )
+    fig.add_vline(x=value, 
+                  line_width=3, 
+                  line_color='red', 
+                  annotation = dict(
+                    align = 'right',
+                    text = value.round(1),
+                    font_size = 16,
+                    font_color = 'red'
+                  ))
+    fig.update_layout(
+        width = 450,
+        height = 130,
+        margin=dict(l=20, r=20, t=20, b=20),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)"
+    )
+    fig.update_xaxes(
+        range = ticks_range,
+        title_text = ticks_name,
+        title_font_size = 12
+    )
+    return fig
+
+
 @app.callback(
     Output('side_menu', 'children', allow_duplicate=True),  
     Output('back','style'),
