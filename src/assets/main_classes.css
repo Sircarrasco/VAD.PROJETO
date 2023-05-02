@@ -52,3 +52,19 @@
     margin-top: 2%;
     margin-bottom: 2%;
 }
+
+#map_slider{
+    background-color: red;
+    width : 93%;
+    margin-top: -68px;
+    padding-left: 5px;
+    justify-self: center;
+    align-self: center;
+    
+}
+
+#main_menu{
+    display: flex;
+    flex-direction: column;
+    align-content: center
+}
