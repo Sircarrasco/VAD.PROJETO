@@ -26,16 +26,17 @@ app.layout = html.Div(
                     id = 'main_menu',
                     width = 8,
                     children = [
-                        html.H1(children = "Travel destination selection dashboard",
+                        html.H1(children = "Travel destination selection dashboard", id="title",
                         style = {'textAlign': 'center'}),
 
                         html.Div(
                                 children=[
-                                    dbc.Button("World", color="secondary", className="me-1 w-5", value="World", id="continent1"),
-                                    dbc.Button("Asia", color="secondary", className="me-1", value="Asia", id="continent2"),
-                                    dbc.Button("Europe", color="secondary", className="me-1", value="Europe", id="continent3"),
-                                    dbc.Button("North America", color="secondary", className="me-1", value="North America", id="continent4"),
-                                    dbc.Button("South America", color="secondary", className="me-1", value="South America", id="continent5")
+                                    dbc.Button("World", color="secondary", className="me-1 butao", value="World", id="continent1"),
+                                    dbc.Button("Asia", color="secondary", className="me-1 butao", value="Asia", id="continent2"),
+                                    dbc.Button("Europe", color="secondary", className="me-1 butao", value="Europe", id="continent3"),
+                                    dbc.Button("North America", color="secondary", className="me-1 butao", value="North America", id="continent4"),
+                                    dbc.Button("South America", color="secondary", className="me-1 butao", value="South America", id="continent5"),
+                                    dbc.Button("Africa", color="secondary", className="me-1 butao", value="Africa", id="continent6")
                                 ],
                                 style={'textAlign': 'center'},
                                 id="continent"
@@ -61,20 +62,24 @@ app.layout = html.Div(
                 ),
                 dbc.Col(
                     id = 'side_menu',
-                    width=4,
+                    width=4,style={"height": "100vh","overflow-y": "scroll"},
                     children = [
                         html.Div(
                             id='side_menu_content'
                         ),
-                        html.Div(id='call_side_menu', style={'display' : 'none'})
+                        html.Div(id='call_side_menu', style={'display' : 'none'}),
+                        dbc.Button("Back", className="me-1 ", id="back", style = {"display": "none"}, value = "no"),
                     ]
                 )
             ]
         )),
-        dbc.Button("Back", className="me-1 w-5", id="back", style = {"display": "none"}, value = "no"),
+        
         dcc.Store(id='intermediate-value'),
         dcc.Store(id='button_value')
-    ]
+    ],
+    style={
+        "margin-bottom": "-50px"      #<---------- here
+    }
 )
 
 
@@ -107,7 +112,7 @@ def filter_data(unesco_props, quality_index, security_index, total_population, g
 def side_menu(country):
     # filters button clicked?
     children=[
-            html.Button('Reset', id='filters-selected', n_clicks=0),
+            dbc.Button('Reset',className="me-1 butao", id='filters-selected', n_clicks=0),
             html.Div(id='filters-info'),
             dcc.Graph(id='cost_by_continent'),
             html.Div(
@@ -140,7 +145,7 @@ def side_menu(country):
                             )
                         ]
                     ),
-                            
+                    dbc.Button("Back", className="me-1 w-5", id="back", style = {"display": "none"}, value = "no")        
                 ])
                             
                 ]
@@ -237,11 +242,13 @@ def show_filters(n_clicks):
     Input('continent3', 'n_clicks'),
     Input('continent4', 'n_clicks'),
     Input('continent5', 'n_clicks'),
+    Input('continent6', 'n_clicks'),
     Input('continent1', 'value'),
     Input('continent2', 'value'),
     Input('continent3', 'value'),
     Input('continent4', 'value'),
     Input('continent5', 'value'),
+    Input('continent6', 'value'),
     Input('intermediate-value', 'data'), 
     Input('map_variable', 'value'),
     Input("button_value",'data'),
@@ -249,7 +256,7 @@ def show_filters(n_clicks):
     )
 
 # function to show world map with filters 
-def map_view(button1_clicks, button2_clicks,button3_clicks, button4_clicks, button5_clicks, button1_value, button2_value, button3_value, button4_value, button5_value, json_data, map_variable, button_variable,map_slider):
+def map_view(button1_clicks, button2_clicks,button3_clicks, button4_clicks, button5_clicks, button6_clicks, button1_value, button2_value, button3_value, button4_value, button5_value, button6_value,json_data, map_variable, button_variable,map_slider):
     data = pd.read_json(json_data, orient='split')
     if button1_clicks is None and button2_clicks is None and button3_clicks is None and button4_clicks is None and button5_clicks is None:
         country = "World"
@@ -271,6 +278,9 @@ def map_view(button1_clicks, button2_clicks,button3_clicks, button4_clicks, butt
         elif button_id == 'continent5':
             #print(button5_value)
             country = button5_value
+        elif button_id == 'continent6':
+            #print(button5_value)
+            country = button6_value
         else:
             country = button_variable["country"]
 
@@ -289,6 +299,10 @@ def map_view(button1_clicks, button2_clicks,button3_clicks, button4_clicks, butt
     elif country == "South America":
         aux_data = data[data["continent"] == country]
         aux_scope = "south america"
+
+    elif country == "Africa":
+        aux_data = data[data["continent"] == country]
+        aux_scope = "africa"
     else:
         aux_data = data
         aux_scope = "world"
@@ -338,7 +352,7 @@ def map_view(button1_clicks, button2_clicks,button3_clicks, button4_clicks, butt
         xanchor='center',
         x=0.5,
         lenmode='fraction',
-        len=0.5,
+        len=0.9,
         ticks='outside'
     )
     )
@@ -356,10 +370,16 @@ def display_average_by_country(json_data, map_variable):
 
     continent_data = data.groupby('continent').mean(numeric_only=True).reset_index()
 
+    # Define colors for each bar
+    colors = ['#30426A', '#30426A', '#30426A', '#30426A', '#30426A', '#30426A']
+
     fig = go.Figure(
         data = go.Bar(
             x = continent_data['continent'],
-            y = continent_data[map_variable]
+            y = continent_data[map_variable],
+            marker=dict(
+            color=colors
+    )
         )
         )
 
@@ -385,13 +405,17 @@ def display_scatter(y_var, x_var, json_data):
     labels_map = {}
     for l, v in zip(labels, variables):
         labels_map[v] = l
-    continent_colors = LabelEncoder().fit_transform(df['continent'])
+    #continent_colors = LabelEncoder().fit_transform(df['continent'])
+    continent_colors = {'Asia': '#FF5733', 'Europe': '#FFC300', 'Africa': '#DAF7A6', 'South America': '#C70039',"North America": "#30426A" ,'Oceania': '#900C3F'}
+    marker_colors = [continent_colors[continent] if continent in continent_colors else 'black' for continent in df['continent']]
+
     fig = go.Figure(
         data= go.Scatter(
             y = df[y_var],
             x = df[x_var],
             text = df['country'],
             mode ='markers',
+            marker_color = marker_colors,
             # marker_color = continent_colors
             # marker_size=df['total_population'],
             # marker_max_size=20
@@ -417,7 +441,6 @@ def display_scatter(y_var, x_var, json_data):
 
 @app.callback(
     Output('side_menu', 'children' , allow_duplicate=True),
-    Output('back','style', allow_duplicate=True),
     Input('map-graph', 'clickData'),
     Input('side_menu', 'style'),
     
@@ -460,8 +483,8 @@ def display_click_data(clickData,content):
 
         fig = go.Figure(
             data=[
-            go.Bar(name='Female', x=pop_data.loc[pop_data.gender == 'Female', 'age-range'], y=pop_data.loc[pop_data.gender == 'Female', 'percentage']),
-            go.Bar(name='Male', x=pop_data.loc[pop_data.gender == 'Male', 'age-range'], y=pop_data.loc[pop_data.gender == 'Male', 'percentage'])
+            go.Bar(name='Female', x=pop_data.loc[pop_data.gender == 'Female', 'age-range'], y=pop_data.loc[pop_data.gender == 'Female', 'percentage'], marker=dict(color='#30426A')),
+            go.Bar(name='Male', x=pop_data.loc[pop_data.gender == 'Male', 'age-range'], y=pop_data.loc[pop_data.gender == 'Male', 'percentage'], marker=dict(color='#636363'))
             ]
         )
         fig.update_layout(
@@ -508,7 +531,8 @@ def display_click_data(clickData,content):
         fig2 = go.Figure(
             go.Pie(
                 labels = names,
-                values = values
+                values = values,
+                marker=dict(colors=['#274382', '#276782', '#30426A', '#31B9C9', '#32B0CB'])
             )
         )
 
@@ -528,7 +552,7 @@ def display_click_data(clickData,content):
     
 
         children=[
-            html.H1(country),
+            html.H1(country, id="country_name"),
             html.P(children='Daily Cost', className='country_info_item'),
             dcc.Graph(figure=cost),
             html.P(children='QUALITY OF LIFE', className='country_info_item'),
@@ -538,13 +562,14 @@ def display_click_data(clickData,content):
             html.P('GDP', className='country_info_item'),
             dcc.Graph(figure=gdp),
             dcc.Graph(id='population_plot', figure = fig),
-            dcc.Graph(id='population_plot2', figure = fig2)
+            dcc.Graph(id='population_plot2', figure = fig2),
+            dbc.Button("Back", className="me-1 w-5", id="back", style = {"display": "block"}, value = "no"),
             ]
     
-        return html.Div(children=children),{'display': 'block'}
+        return html.Div(children=children)
     else:
         children=[
-            html.Button('Reset', id='filters-selected', n_clicks=0),
+            dbc.Button('Reset', id='filters-selected' ,className="me-1 buttao", n_clicks=0),
             html.Div(id='filters-info'),
             dcc.Graph(id='cost_by_continent'),
             html.Div(
@@ -580,7 +605,7 @@ def display_click_data(clickData,content):
                             
                 ])
             ]
-    return html.Div(children=children), {'display': 'none'}
+    return html.Div(children=children)
 
 
 def get_info_graph(data, country, variable, display_name, ticks_range, ticks_name):
@@ -621,44 +646,45 @@ def get_info_graph(data, country, variable, display_name, ticks_range, ticks_nam
     Input('back', 'n_clicks'))
 def back_callback(back):
     print('here')
-    children=[
-            html.Button('Reset', id='filters-selected', n_clicks=0),
-            html.Div(id='filters-info'),
-            dcc.Graph(id='cost_by_continent'),
-            html.Div(
-                className="scatter_plot",
-                children=[
-                    html.Div(
-                        dcc.Graph(id='variables_scatter'),
-                    ),
-                    html.Div(
-                        id='scatter_vars',
-                        children = [
-                            dcc.Dropdown(
-                                id = 'x_variable',
-                                options = [{'label' : l, 'value': v} 
-                                            for l, v in zip(
-                                                ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
-                                                ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
-                                value = 'quality_of_life',
-                                clearable=False
-                            ),
-                            html.P('VS'),
-                            dcc.Dropdown(
-                                id = 'y_variable',
-                                options = [{'label' : l, 'value': v} 
-                                            for l, v in zip(
-                                                ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
-                                                ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
-                                value = 'safety_index',
-                                clearable=False
-                            )
-                        ]
-                    ),
-                            
-                ])
-            ]
-    return html.Div(children=children), {'display': 'none'} 
+    if back is not None:
+        children=[
+                dbc.Button('Reset', className="me-1 butao", id='filters-selected', n_clicks=0),
+                html.Div(id='filters-info'),
+                dcc.Graph(id='cost_by_continent'),
+                html.Div(
+                    className="scatter_plot",
+                    children=[
+                        html.Div(
+                            dcc.Graph(id='variables_scatter'),
+                        ),
+                        html.Div(
+                            id='scatter_vars',
+                            children = [
+                                dcc.Dropdown(
+                                    id = 'x_variable',
+                                    options = [{'label' : l, 'value': v} 
+                                                for l, v in zip(
+                                                    ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
+                                                    ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
+                                    value = 'quality_of_life',
+                                    clearable=False
+                                ),
+                                html.P('VS'),
+                                dcc.Dropdown(
+                                    id = 'y_variable',
+                                    options = [{'label' : l, 'value': v} 
+                                                for l, v in zip(
+                                                    ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
+                                                    ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
+                                    value = 'safety_index',
+                                    clearable=False
+                                )
+                            ]
+                        ),
+                                
+                    ])
+                ]
+        return html.Div(children=children), {'display': 'none'} 
 
 # callback to update slider
 
