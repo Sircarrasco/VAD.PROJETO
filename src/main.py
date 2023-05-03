@@ -31,17 +31,18 @@ app.layout = html.Div(
 
                         html.Div(
                                 children=[
-                                    dbc.Button("World", color="secondary", className="me-1 butao", value="World", id="continent1"),
-                                    dbc.Button("Asia", color="secondary", className="me-1 butao", value="Asia", id="continent2"),
-                                    dbc.Button("Europe", color="secondary", className="me-1 butao", value="Europe", id="continent3"),
-                                    dbc.Button("North America", color="secondary", className="me-1 butao", value="North America", id="continent4"),
-                                    dbc.Button("South America", color="secondary", className="me-1 butao", value="South America", id="continent5"),
-                                    dbc.Button("Africa", color="secondary", className="me-1 butao", value="Africa", id="continent6")
+                                    dbc.Button("World", color="secondary", className="me-1 button_class", value="World", id="continent1"),
+                                    dbc.Button("Asia", color="secondary", className="me-1 button_class", value="Asia", id="continent2"),
+                                    dbc.Button("Europe", color="secondary", className="me-1 button_class", value="Europe", id="continent3"),
+                                    dbc.Button("North America", color="secondary", className="me-1 button_class", value="North America", id="continent4"),
+                                    dbc.Button("South America", color="secondary", className="me-1 button_class", value="South America", id="continent5"),
+                                    dbc.Button("Africa", color="secondary", className="me-1 button_class", value="Africa", id="continent6")
                                 ],
                                 style={'textAlign': 'center'},
                                 id="continent"
                             ),
                         html.Div(
+                            id='map_variable_container',
                             children=[dcc.Dropdown(
                                 id='map_variable',
                                 options = [
@@ -56,8 +57,15 @@ app.layout = html.Div(
                         ),
 
                         dcc.Graph(id="map-graph"),
-                        dcc.RangeSlider(min=62, max=2256.08, step=150, value=[62 ,2256.08], id='map_slider')
-                        ]
+                        dcc.RangeSlider(
+                            min=62, 
+                            max=2257, 
+                            step=1, 
+                            value=[62 ,2256.08], 
+                            id='map_slider',
+                            marks=None
+                            ),
+                        ],
                     
                 ),
                 dbc.Col(
@@ -89,10 +97,7 @@ def filter_data(unesco_props, quality_index, security_index, total_population, g
     path = os.path.join('data', 'dataset_alpha.csv')
     data = pd.read_csv(path)
     # define costs
-    data['average_cost_rich'] = 2 * data.x2 + data.x24 + data.x48 + data.x30 + 60 * data.x37 + data.x38 + data.x6 + data.x23
-    data['average_cost_medium'] = 2 * data.x3 + data.x4 + data.x49 + data.x28 + 30 * data.x37 + data.x38 + data.x6 + data.x23
-    data['average_cost_lower'] = 2 * data.x1 + data.x49 + data.x8 + 10 * data.x37 + data.x23
-
+    
     # filter data according to the users preferences
     filtered_data = data.loc[
         (data.safety_index >= security_index[0]) & (data.safety_index <= security_index[1]) &
@@ -112,7 +117,7 @@ def filter_data(unesco_props, quality_index, security_index, total_population, g
 def side_menu(country):
     # filters button clicked?
     children=[
-            dbc.Button('Reset',className="me-1 butao", id='filters-selected', n_clicks=0),
+            dbc.Button('Reset',className="me-1 button_class", id='filters-selected', n_clicks=0),
             html.Div(id='filters-info'),
             dcc.Graph(id='cost_by_continent'),
             html.Div(
@@ -326,35 +331,46 @@ def map_view(button1_clicks, button2_clicks,button3_clicks, button4_clicks, butt
     # fig = pg.Figure(data = [d], 
     #             layout = layout)
 
-    data['average_cost_rich'] = 2 * data.x2 + data.x24 + data.x48 + data.x30 + 60 * data.x37 + data.x38 + data.x6 + data.x23
-    data['average_cost_medium'] = 2 * data.x3 + data.x4 + data.x49 + data.x28 + 30 * data.x37 + data.x38 + data.x6 + data.x23
-    data['average_cost_lower'] = 2 * data.x1 + data.x49 + data.x8 + 10 * data.x37 + data.x23
+    min_max_values = {
+        'average_cost_lower' : [45, 2118],
+        'average_cost_medium' : [60, 2257],
+        'average_cost_rich' : [118, 5467],
+        'safety_index' : [16, 87],
+        'quality_of_life' : [33, 88],
+        'unesco_props' : [0, 58],
+        'GDP' : [0, 17420],
+        'total_population' : [11204, 1412360000.0]
+    }
+
 
     aux_data = aux_data.loc[ (aux_data[map_variable] <= map_slider[1]) & (aux_data[map_variable] >= map_slider[0])]
-
     fig = px.choropleth(data_frame      = aux_data,
                         locations       = 'code',
                         locationmode    = 'ISO-3',
-                        color_continuous_scale=['white', 'orange'], # Set color
+                        color_continuous_scale=['yellow', 'red'], # Set color
                         color           = map_variable,
                         scope           = aux_scope,
-                        hover_name      = 'country'
+                        hover_name      = 'country',
+                        range_color= min_max_values[map_variable],
+                        # height=1000,
                         )
 
     fig.update_layout(
         showlegend=True,
         margin={"r":0,"t":0,"l":0,"b":0},
         plot_bgcolor ='white',
+        coloraxis_colorbar_title_text = '',
         coloraxis_colorbar=dict(
-        orientation='h',
-        yanchor='bottom',
-        y=-0.5,
-        xanchor='center',
-        x=0.5,
-        lenmode='fraction',
-        len=0.9,
-        ticks='outside'
-    )
+            orientation='h',
+            yanchor='bottom',
+            y=-0.5,
+            xanchor='center',
+            x=0.5,
+            lenmode='fraction',
+            len=0.9,
+            ticks='outside'
+        ),
+        
     )
     # Disable hover effects
     fig.data[0].hovertemplate = None
@@ -446,9 +462,8 @@ def display_scatter(y_var, x_var, json_data):
     Input('map_variable','value')
 )
 def display_click_data(clickData,content,map_variable):
-
+    
     if clickData is not None :
-        #print(clickData['points'][0]['hovertext'])
         country = clickData['points'][0]['hovertext']
         path = os.path.join('data', 'dataset_alpha.csv')
         data = pd.read_csv(path)
@@ -476,10 +491,6 @@ def display_click_data(clickData,content,map_variable):
             else:
                 pop_data.loc[index, 'age-range'] = '65+'
 
-        data['average_cost_rich'] = 2 * data.x2 + data.x24 + data.x48 + data.x30 + 60 * data.x37 + data.x38 + data.x6 + data.x23
-        data['average_cost_medium'] = 2 * data.x3 + data.x4 + data.x49 + data.x28 + 30 * data.x37 + data.x38 + data.x6 + data.x23
-        data['average_cost_lower'] = 2 * data.x1 + data.x49 + data.x8 + 10 * data.x37 + data.x23
-        data['cost_average'] = data[['average_cost_rich', 'average_cost_medium', 'average_cost_lower']].mean(axis=1)
 
         fig = go.Figure(
             data=[
@@ -544,26 +555,22 @@ def display_click_data(clickData,content,map_variable):
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)"
         )
-        #print('get graphs')
         quality_of_index = get_info_graph(data, country, 'quality_of_life', 'Quality of life', [0, 100], '%')
         security_index = get_info_graph(data, country, 'safety_index', 'Security Index', [0, 100], '%')
         gdp = get_info_graph(data, country, 'GDP', 'GDP', [0, 20000], 'Billions US $')
         cost = get_info_graph(data, country, 'cost_average', 'Daily Cost', [data['cost_average'].min(), data['cost_average'].max()], 'US $')
     
         if map_variable in ["average_cost_medium","average_cost_rich","average_cost_lower"]:
-            print("oi")
             data["oposite_rank"] = data[map_variable].rank(ascending=False)
-            rank = data["oposite_rank"].loc[data["country"] == country]
-            print("rank: ",rank)
+            rank = data.loc[data["country"] == country, "oposite_rank"].values[0]
         else:
-            print("oi2")
             data["rank"] = data[map_variable].rank()
-            rank = data["rank"].loc[data["country"] == country]
-        print("pais: ",country, )    
-        print("rank: ",rank)
+            rank = data.loc[data["country"] == country, "rank"].values[0]
         children=[
-            html.H1(country, id="country_name"),
-            html.H1(rank, id="rank"),
+            html.Div(id='country_header', children=[
+                html.H1(country, id="country_name"),
+                html.H3(f'{int(rank)}º / {len(data)}', id="rank"),
+            ]),
             html.P(children='Daily Cost', className='country_info_item'),
             dcc.Graph(figure=cost),
             html.P(children='QUALITY OF LIFE', className='country_info_item'),
@@ -656,10 +663,9 @@ def get_info_graph(data, country, variable, display_name, ticks_range, ticks_nam
     Output('back','style'),
     Input('back', 'n_clicks'))
 def back_callback(back):
-    #print('here')
     if back is not None:
         children=[
-                dbc.Button('Reset', className="me-1 butao", id='filters-selected', n_clicks=0),
+                dbc.Button('Reset', className="me-1 button_class", id='filters-selected', n_clicks=0),
                 html.Div(id='filters-info'),
                 dcc.Graph(id='cost_by_continent'),
                 html.Div(
@@ -708,14 +714,11 @@ def back_callback(back):
 def back_callback(value):
     path = os.path.join('data', 'dataset_alpha.csv')
     data = pd.read_csv(path)
-    data['average_cost_rich'] = 2 * data.x2 + data.x24 + data.x48 + data.x30 + 60 * data.x37 + data.x38 + data.x6 + data.x23
-    data['average_cost_medium'] = 2 * data.x3 + data.x4 + data.x49 + data.x28 + 30 * data.x37 + data.x38 + data.x6 + data.x23
-    data['average_cost_lower'] = 2 * data.x1 + data.x49 + data.x8 + 10 * data.x37 + data.x23
     
     min = data[value].min()
     max = data[value].max()
 
-    return min, max, [min,max], max//10
+    return min, max, [min,max], 1
     
 
 if __name__ == '__main__':
