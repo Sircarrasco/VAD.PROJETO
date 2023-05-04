@@ -154,18 +154,6 @@ def side_menu(country):
                 ])
                             
                 ]
-                # if country:
-                #     # country selected
-                #     graphs_info = html.Div(
-    #         #Country info
-
-    #     )
-    # else:
-    #     # worldwide view
-    #     graphs_info = html.Div(
-    #         # menu with no country selected
-    #     )
-    # children.append(graphs_info)
     return html.Div(children=children)
 
 
@@ -269,22 +257,16 @@ def map_view(button1_clicks, button2_clicks,button3_clicks, button4_clicks, butt
         ctx = dash.callback_context
         button_id = ctx.triggered[0]['prop_id'].split('.')[0]
         if button_id == 'continent1':
-            #print(button1_value)
             country = button1_value
         elif button_id == 'continent2':
-            #print(button2_value)
             country = button2_value
         elif button_id == 'continent3':
-            #print(button3_value)
             country = button3_value
         elif button_id == 'continent4':
-            #print(button4_value)
             country = button4_value
         elif button_id == 'continent5':
-            #print(button5_value)
             country = button5_value
         elif button_id == 'continent6':
-            #print(button5_value)
             country = button6_value
         else:
             country = button_variable["country"]
@@ -312,25 +294,6 @@ def map_view(button1_clicks, button2_clicks,button3_clicks, button4_clicks, butt
         aux_data = data
         aux_scope = "world"
 
-    
-    # d = dict(
-    #     type='choropleth',
-    #     locations = aux_data['code'],
-    #     z=aux_data[map_variable],
-    #     text=aux_data['country'],
-    #     colorscale=["white",'orange'],
-    # )
-    # # print(map_var_title)
-    # layout = dict(
-    #     # title = map_var_title,
-    #     geo=dict(
-    #         scope=aux_scope
-    #         ),
-    #     # width = '90%'
-    # )
-    # fig = pg.Figure(data = [d], 
-    #             layout = layout)
-
     min_max_values = {
         'average_cost_lower' : [45, 2118],
         'average_cost_medium' : [60, 2257],
@@ -352,7 +315,6 @@ def map_view(button1_clicks, button2_clicks,button3_clicks, button4_clicks, butt
                         scope           = aux_scope,
                         hover_name      = 'country',
                         range_color= min_max_values[map_variable],
-                        # height=1000,
                         )
 
     fig.update_layout(
@@ -457,9 +419,9 @@ def display_scatter(y_var, x_var, json_data):
 
 @app.callback(
     Output('side_menu', 'children' , allow_duplicate=True),
-    Input('map-graph', 'clickData'),
+    [Input('map-graph', 'clickData'),
     Input('side_menu', 'style'),
-    Input('map_variable','value')
+    Input('map_variable','value')]
 )
 def display_click_data(clickData,content,map_variable):
     
@@ -513,7 +475,6 @@ def display_click_data(clickData,content,map_variable):
             title_text = 'Percentage of the population',
         )
         
-        #country = 'Portugal'
         country_data = data[data.country == country]
 
         meals = [1, 2, 3]
@@ -561,11 +522,11 @@ def display_click_data(clickData,content,map_variable):
         cost = get_info_graph(data, country, 'cost_average', 'Daily Cost', [data['cost_average'].min(), data['cost_average'].max()], 'US $')
     
         if map_variable in ["average_cost_medium","average_cost_rich","average_cost_lower"]:
-            data["oposite_rank"] = data[map_variable].rank(ascending=False)
-            rank = data.loc[data["country"] == country, "oposite_rank"].values[0]
-        else:
             data["rank"] = data[map_variable].rank()
             rank = data.loc[data["country"] == country, "rank"].values[0]
+        else:
+            data["oposite_rank"] = data[map_variable].rank(ascending=False)
+            rank = data.loc[data["country"] == country, "oposite_rank"].values[0]
         children=[
             html.Div(id='country_header', children=[
                 html.H1(country, id="country_name"),
@@ -704,7 +665,6 @@ def back_callback(back):
         return html.Div(children=children), {'display': 'none'} 
 
 # callback to update slider
-
 @app.callback(
     Output('map_slider', 'min'),
     Output('map_slider', 'max'),
