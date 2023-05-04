@@ -83,7 +83,14 @@ app.layout = html.Div(
         )),
         
         dcc.Store(id='intermediate-value'),
-        dcc.Store(id='button_value')
+        dcc.Store(id='button_value'),
+        dcc.Store(id='filters-data', data={
+            'quality_index': [0, 100],
+            'security_index': [0, 100],
+            'unesco_props' : [0, 60],
+            'GDP' : [0.04, 17420],
+            'total_population' : [1.120400e+04, 1.412360e+09]
+        })
     ],
     style={
         "margin-bottom": "-50px"
@@ -92,6 +99,7 @@ app.layout = html.Div(
 
 
 @app.callback(Output('intermediate-value', 'data', allow_duplicate=True), 
+              Output('filters-data', 'data', allow_duplicate=True),
               [Input('unesco_props', 'value'), Input('quality_index', 'value'), Input('security_index', 'value'), Input('total_population', 'value'), Input('GDP', 'value')])
 def filter_data(unesco_props, quality_index, security_index, total_population, gdp):
     path = os.path.join('data', 'dataset_alpha.csv')
@@ -105,63 +113,22 @@ def filter_data(unesco_props, quality_index, security_index, total_population, g
         (data.unesco_props >= unesco_props[0]) & (data.unesco_props <= unesco_props[1]) & 
         (data.total_population >= total_population[0]) & (data.total_population <= total_population[1]) &
         (data.GDP >= gdp[0]) & (data.GDP <= gdp[1])
-        # TODO: add cost
     ]
-    return filtered_data.to_json(date_format='iso', orient='split')
+    return filtered_data.to_json(date_format='iso', orient='split'), {
+            'quality_index': quality_index,
+            'security_index': security_index,
+            'unesco_props' : unesco_props,
+            'GDP' : gdp,
+            'total_population' : total_population
+        }
 
-
-@app.callback(
-    Output('side_menu_content', 'children'),
-    Input('call_side_menu', 'children')
-)
-def side_menu(country):
-    # filters button clicked?
-    children=[
-            dbc.Button('Reset',className="me-1 button_class", id='filters-selected', n_clicks=0),
-            html.Div(id='filters-info'),
-            dcc.Graph(id='cost_by_continent'),
-            html.Div(
-                className="scatter_plot",
-                children=[
-                    html.Div(
-                        dcc.Graph(id='variables_scatter'),
-                    ),
-                    html.Div(
-                        id='scatter_vars',
-                        children = [
-                            dcc.Dropdown(
-                                id = 'x_variable',
-                                options = [{'label' : l, 'value': v} 
-                                            for l, v in zip(
-                                                ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
-                                                ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
-                                value = 'quality_of_life',
-                                clearable=False
-                            ),
-                            html.P('VS'),
-                            dcc.Dropdown(
-                                id = 'y_variable',
-                                options = [{'label' : l, 'value': v} 
-                                            for l, v in zip(
-                                                ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
-                                                ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
-                                value = 'safety_index',
-                                clearable=False
-                            )
-                        ]
-                    ),
-                    dbc.Button("Back", className="me-1 w-5", id="back", style = {"display": "none"}, value = "no")        
-                ])
-                            
-                ]
-    return html.Div(children=children)
 
 
 @app.callback(
     Output('filters-info', 'children'),
-    Input('filters-selected', 'n_clicks')
+    Input('filters-selected', 'n_clicks'), Input('filters-data', 'data')
 )
-def show_filters(n_clicks):
+def show_filters(n_clicks, filter_data):
     display='block'
     content = html.Div(
         children=[
@@ -171,7 +138,7 @@ def show_filters(n_clicks):
                     html.P('Security Index', className='filter_sec'),
                     dcc.RangeSlider(
                         min=0, max=100,
-                        value = [0, 100],
+                        value = filter_data['security_index'],
                         id = 'security_index'
                     ),
                 ]
@@ -182,7 +149,7 @@ def show_filters(n_clicks):
                     html.P('Quality Index', className='filter_sec'),
                     dcc.RangeSlider(
                         min=0, max=100,
-                        value = [0, 100],
+                        value = filter_data['quality_index'],
                         id = 'quality_index'
                     ),
                 ]
@@ -193,7 +160,7 @@ def show_filters(n_clicks):
                     html.P('No. UNESCO properties', className='filter_sec'),
                     dcc.RangeSlider(
                         min=0, max=60,
-                        value = [0, 60],
+                        value = filter_data['unesco_props'],
                         id = 'unesco_props'
                     ),
                 ]
@@ -204,7 +171,7 @@ def show_filters(n_clicks):
                 html.P('GDP',className='filter_sec'),
                 dcc.RangeSlider(
                     min=0.04, max=17420,
-                    value = [0.04, 17420],
+                    value = filter_data['GDP'],
                     id = 'GDP'
                     ),
                 ]
@@ -215,12 +182,11 @@ def show_filters(n_clicks):
                     html.P('Population',className='filter_sec'),
                     dcc.RangeSlider(
                         min=1.120400e+04, max=1.412360e+09,
-                        value = [1.120400e+04, 1.412360e+09],
+                        value = filter_data['total_population'],
                         id = 'total_population'
                     ),
                 ]
             ),
-
         ],
         style = {'display' : display}
     )
@@ -364,7 +330,6 @@ def display_average_by_country(json_data, map_variable):
     fig.update_layout(
         title = dict(
                 text=f'Average per continent',
-                font=dict(size=30),
                 x=0.5
             ),
         paper_bgcolor="rgba(0,0,0,0)",
@@ -394,18 +359,10 @@ def display_scatter(y_var, x_var, json_data):
             text = df['country'],
             mode ='markers',
             marker_color = marker_colors,
-            # marker_color = continent_colors
-            # marker_size=df['total_population'],
-            # marker_max_size=20
+            
         ),
     )
     fig.update_layout(
-        # title = dict(
-        #         text=f'{labels_map[y_var]} - {labels_map[x_var]}',
-        #         # font=dict(size=24, weight='bold'),
-        #         x=0.5,
-                
-        #     ),
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)"
      )
@@ -547,43 +504,7 @@ def display_click_data(clickData,content,map_variable):
     
         return html.Div(children=children)
     else:
-        children=[
-            dbc.Button('Reset', id='filters-selected' ,className="me-1 buttao", n_clicks=0),
-            html.Div(id='filters-info'),
-            dcc.Graph(id='cost_by_continent'),
-            html.Div(
-                className="scatter_plot",
-                children=[
-                    html.Div(
-                        dcc.Graph(id='variables_scatter'),
-                    ),
-                    html.Div(
-                        id='scatter_vars',
-                        children = [
-                            dcc.Dropdown(
-                                id = 'x_variable',
-                                options = [{'label' : l, 'value': v} 
-                                            for l, v in zip(
-                                                ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
-                                                ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
-                                value = 'quality_of_life',
-                                clearable=False
-                            ),
-                            html.P('VS'),
-                            dcc.Dropdown(
-                                id = 'y_variable',
-                                options = [{'label' : l, 'value': v} 
-                                            for l, v in zip(
-                                                ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
-                                                ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
-                                value = 'safety_index',
-                                clearable=False
-                            )
-                        ]
-                    ),
-                            
-                ])
-            ]
+        children= get_side_bar()
     return html.Div(children=children)
 
 
@@ -618,14 +539,8 @@ def get_info_graph(data, country, variable, display_name, ticks_range, ticks_nam
     )
     return fig
 
-
-@app.callback(
-    Output('side_menu', 'children', allow_duplicate=True),  
-    Output('back','style'),
-    Input('back', 'n_clicks'))
-def back_callback(back):
-    if back is not None:
-        children=[
+def get_side_bar():
+    children=[
                 dbc.Button('Reset', className="me-1 button_class", id='filters-selected', n_clicks=0),
                 html.Div(id='filters-info'),
                 dcc.Graph(id='cost_by_continent'),
@@ -662,6 +577,16 @@ def back_callback(back):
                                 
                     ])
                 ]
+    return children
+
+
+@app.callback(
+    Output('side_menu', 'children', allow_duplicate=True),  
+    Output('back','style'),
+    Input('back', 'n_clicks'))
+def back_callback(back):
+    if back is not None:
+        children = get_side_bar()
         return html.Div(children=children), {'display': 'none'} 
 
 # callback to update slider
