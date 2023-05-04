@@ -64,8 +64,16 @@ app.layout = html.Div(
                             step=1, 
                             value=[62 ,2256.08], 
                             id='map_slider',
-                            marks=None
+                            marks=None,
+                            className='slider_class'
                             ),
+                        html.Div(
+                            id='no_data_container',
+                            children=[
+                                html.Div(id='no_data'),
+                                html.P('No data available', id='no_data_text')
+                            ]
+                        )
                         ],
                     
                 ),
@@ -77,7 +85,6 @@ app.layout = html.Div(
                             id='side_menu_content'
                         ),
                         html.Div(id='call_side_menu', style={'display' : 'none'}),
-                        dbc.Button("Back", className="me-1 ", id="back", style = {"display": "none"}, value = "no"),
                     ]
                 )
             ]
@@ -149,7 +156,8 @@ def show_filters(n_clicks, filter_data):
                     dcc.RangeSlider(
                         min=0, max=100,
                         value = filter_data['security_index'],
-                        id = 'security_index'
+                        id = 'security_index',
+                        className='slider_class'
                     ),
                 ]
             ),
@@ -160,7 +168,8 @@ def show_filters(n_clicks, filter_data):
                     dcc.RangeSlider(
                         min=0, max=100,
                         value = filter_data['quality_index'],
-                        id = 'quality_index'
+                        id = 'quality_index',
+                        className='slider_class'
                     ),
                 ]
             ),
@@ -171,7 +180,8 @@ def show_filters(n_clicks, filter_data):
                     dcc.RangeSlider(
                         min=0, max=60,
                         value = filter_data['unesco_props'],
-                        id = 'unesco_props'
+                        id = 'unesco_props',
+                        className='slider_class'
                     ),
                 ]
             ),
@@ -182,7 +192,8 @@ def show_filters(n_clicks, filter_data):
                 dcc.RangeSlider(
                     min=0.04, max=17420,
                     value = filter_data['GDP'],
-                    id = 'GDP'
+                    id = 'GDP',
+                    className='slider_class'
                     ),
                 ]
             ),
@@ -193,7 +204,8 @@ def show_filters(n_clicks, filter_data):
                     dcc.RangeSlider(
                         min=1.120400e+04, max=1.412360e+09,
                         value = filter_data['total_population'],
-                        id = 'total_population'
+                        id = 'total_population',
+                        className='slider_class'
                     ),
                 ]
             ),
@@ -343,10 +355,12 @@ def display_average_by_country(json_data, map_variable):
     fig.update_layout(
         title = dict(
                 text=f'Average per continent',
-                x=0.5
+                x=0.5,
+                y=0.85
             ),
         paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)"
+        plot_bgcolor="rgba(0,0,0,0)",
+        height=400,
     )
     return fig
 
@@ -369,6 +383,7 @@ def display_scatter(y_var, x_var, json_data):
     fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
+        height=400,
      )
     fig.update_xaxes(
         title_text= labels_map[x_var]
@@ -424,10 +439,12 @@ def display_click_data(clickData,content,map_variable):
         fig.update_layout(
             title=dict(
                 text = 'Distribution of the population',
-                x = 0.5
+                x = 0.5,
+                y=0.85
             ),
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
+            height=400,
         )
         fig.update_xaxes(
             title_text = 'Age'
@@ -472,10 +489,12 @@ def display_click_data(clickData,content,map_variable):
         fig2.update_layout(
             title = dict(
                 text = '% of each cost for the total value',
-                x = 0.5
+                x = 0.5,
+                y=0.85
             ),
             paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)"
+            plot_bgcolor="rgba(0,0,0,0)",
+            height=400,
         )
         quality_of_index = get_info_graph(data, country, 'quality_of_life', 'Quality of life', [0, 100], '%')
         security_index = get_info_graph(data, country, 'safety_index', 'Security Index', [0, 100], '%')
@@ -489,6 +508,7 @@ def display_click_data(clickData,content,map_variable):
             data["oposite_rank"] = data[map_variable].rank(ascending=False)
             rank = data.loc[data["country"] == country, "oposite_rank"].values[0]
         children=[
+            dbc.Button("Back", className="me-1 w-5", id="back", style = {"display": "block"}, value = "no"),
             html.Div(id='country_header', children=[
                 html.H1(country, id="country_name"),
                 html.H3(f'#{int(rank)} / {len(data)}', id="rank"),
@@ -503,7 +523,6 @@ def display_click_data(clickData,content,map_variable):
             dcc.Graph(figure=gdp),
             dcc.Graph(id='population_plot', figure = fig),
             dcc.Graph(id='population_plot2', figure = fig2),
-            dbc.Button("Back", className="me-1 w-5", id="back", style = {"display": "block"}, value = "no"),
             ]
     
         return html.Div(children=children)
