@@ -86,7 +86,7 @@ app.layout = html.Div(
         dcc.Store(id='button_value')
     ],
     style={
-        "margin-bottom": "-50px"      #<---------- here
+        "margin-bottom": "-50px"
     }
 )
 
@@ -530,7 +530,7 @@ def display_click_data(clickData,content,map_variable):
         children=[
             html.Div(id='country_header', children=[
                 html.H1(country, id="country_name"),
-                html.H3(f'{int(rank)}º / {len(data)}', id="rank"),
+                html.H3(f'#{int(rank)} / {len(data)}', id="rank"),
             ]),
             html.P(children='Daily Cost', className='country_info_item'),
             dcc.Graph(figure=cost),
