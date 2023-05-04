@@ -508,7 +508,7 @@ def display_click_data(clickData,content,map_variable):
             data["oposite_rank"] = data[map_variable].rank(ascending=False)
             rank = data.loc[data["country"] == country, "oposite_rank"].values[0]
         children=[
-            dbc.Button("Back", className="me-1 w-5", id="back", style = {"display": "block"}, value = "no"),
+            dbc.Button("Back", color='secondary', className="w-5 me-1 button_class", id="back", style = {"display": "block"}, value = "no"),
             html.Div(id='country_header', children=[
                 html.H1(country, id="country_name"),
                 html.H3(f'#{int(rank)} / {len(data)}', id="rank"),
@@ -564,7 +564,7 @@ def get_info_graph(data, country, variable, display_name, ticks_range, ticks_nam
 
 def get_side_bar():
     children=[
-                dbc.Button('Reset', className="me-1 button_class", id='filters-selected', n_clicks=0),
+                dbc.Button('Reset', color='secondary', className="me-1 button_class", id='filters-selected', n_clicks=0),
                 html.Div(id='filters-info'),
                 dcc.Graph(id='cost_by_continent'),
                 html.Div(
