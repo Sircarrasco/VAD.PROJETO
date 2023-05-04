@@ -52,6 +52,7 @@ app.layout = html.Div(
                                         ['average_cost_rich', 'average_cost_medium', 'average_cost_lower', 'safety_index', 'quality_of_life', 'unesco_props', 'GDP', 'total_population']
                                     )
                                 ],
+                                clearable = False,
                                 value='average_cost_medium'
                             )]
                         ),
@@ -125,10 +126,19 @@ def filter_data(unesco_props, quality_index, security_index, total_population, g
 
 
 @app.callback(
-    Output('filters-info', 'children'),
+    Output('filters-info', 'children'), Output('filters-data', 'data'), Output('filters-selected', 'n_clicks'),
     Input('filters-selected', 'n_clicks'), Input('filters-data', 'data')
 )
 def show_filters(n_clicks, filter_data):
+    if n_clicks % 2 != 0:
+        filter_data = {
+            'quality_index': [0, 100],
+            'security_index': [0, 100],
+            'unesco_props' : [0, 60],
+            'GDP' : [0.04, 17420],
+            'total_population' : [1.120400e+04, 1.412360e+09]
+        }
+
     display='block'
     content = html.Div(
         children=[
@@ -190,7 +200,7 @@ def show_filters(n_clicks, filter_data):
         ],
         style = {'display' : display}
     )
-    return content
+    return content, filter_data, 0
 
 
 @app.callback(
@@ -352,19 +362,10 @@ def display_scatter(y_var, x_var, json_data):
     continent_colors = {'Asia': '#FF5733', 'Europe': '#FFC300', 'Africa': '#DAF7A6', 'South America': '#C70039',"North America": "#30426A" ,'Oceania': '#900C3F'}
     marker_colors = [continent_colors[continent] if continent in continent_colors else 'black' for continent in df['continent']]
 
-    fig = go.Figure(
-        data= go.Scatter(
-            y = df[y_var],
-            x = df[x_var],
-            text = df['country'],
-            mode ='markers',
-            marker_color = marker_colors,
-            
-        ),
-    )
+    fig = px.scatter(df, y=y_var, x=x_var, color='continent')
     fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)"
+        plot_bgcolor="rgba(0,0,0,0)",
      )
     fig.update_xaxes(
         title_text= labels_map[x_var]
@@ -423,7 +424,7 @@ def display_click_data(clickData,content,map_variable):
                 x = 0.5
             ),
             paper_bgcolor="rgba(0,0,0,0)",
-            plot_bgcolor="rgba(0,0,0,0)"
+            plot_bgcolor="rgba(0,0,0,0)",
         )
         fig.update_xaxes(
             title_text = 'Age'
