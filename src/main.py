@@ -301,12 +301,15 @@ def map_view(button1_clicks, button2_clicks,button3_clicks, button4_clicks, butt
         coloraxis_colorbar=dict(
             orientation='h',
             yanchor='bottom',
-            y=-0.5,
+            y=-0.25,
             xanchor='center',
             x=0.5,
             lenmode='fraction',
-            len=0.9,
-            ticks='outside'
+            len=0.93,
+            ticks='outside',
+            # tickvals=min_max_values[map_variable],
+            # ticktext=['Low', 'High'],
+            # dtick=2
         ),
         
     )
@@ -514,7 +517,7 @@ def get_info_graph(data, country, variable, display_name, ticks_range, ticks_nam
     value = data.loc[data.country == country, variable].values[0]
     fig = go.Figure(
         data=[
-            go.Histogram(x=data[variable])
+            go.Histogram(x=data[variable], marker=go.histogram.Marker(color='#30426A')),
         ]
     )
     fig.add_vline(x=value, 
@@ -523,15 +526,15 @@ def get_info_graph(data, country, variable, display_name, ticks_range, ticks_nam
                   annotation = dict(
                     align = 'right',
                     text = value.round(1),
-                    font_size = 16,
-                    font_color = 'red'
+                    font_size = 18,
+                    font_color = 'red',
                   ))
     fig.update_layout(
         width = 450,
         height = 130,
         margin=dict(l=20, r=20, t=20, b=20),
         paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)"
+        plot_bgcolor="rgba(0,0,0,0)",
     )
     fig.update_xaxes(
         range = ticks_range,
