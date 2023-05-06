@@ -379,11 +379,13 @@ def display_scatter(y_var, x_var, json_data):
     continent_colors = {'Asia': '#FF5733', 'Europe': '#FFC300', 'Africa': '#DAF7A6', 'South America': '#C70039',"North America": "#30426A" ,'Oceania': '#900C3F'}
     marker_colors = [continent_colors[continent] if continent in continent_colors else 'black' for continent in df['continent']]
 
-    fig = px.scatter(df, y=y_var, x=x_var, color='continent')
+    fig = px.scatter(df, y=y_var, x=x_var, color='continent', color_discrete_sequence=px.colors.qualitative.G10)
     fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         height=400,
+
+        
      )
     fig.update_xaxes(
         title_text= labels_map[x_var]
