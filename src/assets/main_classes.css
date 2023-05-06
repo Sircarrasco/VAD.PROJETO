@@ -107,8 +107,10 @@
     height: 20px;
     width: 40px;
     margin-right: 10px;
-    background-color: #ced4da;
+    background-color: rgb(229, 236, 246);
     border-color: black;
+    border: 1px;
+    border-style: solid;
 }
 
 #no_data_text {
@@ -119,7 +121,7 @@
     display: flex;
     justify-content: start;
     align-items: start;
-    width : 80%;
+    width : 91%;
     margin-top: 30px;
     justify-self: center;
     align-self: center;
