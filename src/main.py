@@ -363,6 +363,8 @@ def display_average_by_country(json_data, map_variable):
         plot_bgcolor="rgba(0,0,0,0)",
         height=400,
     )
+
+    fig.update_yaxes(title_text=map_variable)
     return fig
 
 @app.callback(
@@ -550,6 +552,11 @@ def get_info_graph(data, country, variable, display_name, ticks_range, ticks_nam
     fig.update_xaxes(
         range = ticks_range,
         title_text = ticks_name,
+        title_font_size = 12
+    )
+
+    fig.update_yaxes(
+        title_text = 'No. of countrys',
         title_font_size = 12
     )
     return fig
