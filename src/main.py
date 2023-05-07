@@ -98,7 +98,8 @@ app.layout = html.Div(
             'unesco_props' : [0, 60],
             'GDP' : [0.04, 17420],
             'total_population' : [1.120400e+04, 1.412360e+09]
-        })
+        }),
+        dcc.Store(id='data-all', data=pd.read_csv(os.path.join('data', 'dataset_alpha.csv')).to_json(date_format='iso', orient='split')),
     ],
     style={
         "margin-bottom": "-50px"
@@ -108,10 +109,10 @@ app.layout = html.Div(
 
 @app.callback(Output('intermediate-value', 'data', allow_duplicate=True), 
               Output('filters-data', 'data', allow_duplicate=True),
-              [Input('unesco_props', 'value'), Input('quality_index', 'value'), Input('security_index', 'value'), Input('total_population', 'value'), Input('GDP', 'value')])
-def filter_data(unesco_props, quality_index, security_index, total_population, gdp):
-    path = os.path.join('data', 'dataset_alpha.csv')
-    data = pd.read_csv(path)
+              [Input('unesco_props', 'value'), Input('quality_index', 'value'), Input('security_index', 'value'), Input('total_population', 'value'), Input('GDP', 'value'), Input('data-all', 'data')])
+def filter_data(unesco_props, quality_index, security_index, total_population, gdp, json_data):
+    # path = os.path.join('data', 'dataset_alpha.csv')
+    data = pd.read_json(json_data, orient='split')
     # define costs
     
     # filter data according to the users preferences
@@ -399,14 +400,15 @@ def display_scatter(y_var, x_var, json_data):
     Output('side_menu', 'children' , allow_duplicate=True),
     [Input('map-graph', 'clickData'),
     Input('side_menu', 'style'),
-    Input('map_variable','value')]
+    Input('map_variable','value'), Input('data-all', 'data')]
 )
-def display_click_data(clickData,content,map_variable):
+def display_click_data(clickData,content,map_variable, json_data):
     
     if clickData is not None :
         country = clickData['points'][0]['hovertext']
-        path = os.path.join('data', 'dataset_alpha.csv')
-        data = pd.read_csv(path)
+        # path = os.path.join('data', 'dataset_alpha.csv')
+        # data = pd.read_csv(path)
+        data = pd.read_json(json_data, orient='split')
         country_data = data[data.country == country]
         pop_columns = [col for col in country_data.columns if col.startswith('pop_') and not col.endswith('%')]
         pop_data = country_data[pop_columns].T.reset_index()
@@ -457,24 +459,12 @@ def display_click_data(clickData,content,map_variable):
         
         country_data = data[data.country == country]
 
-        meals = [1, 2, 3]
-        market = [23, 25, 24, 27]
-        transports = [28, 30, 33]
-        internet = [37, 38]
-        habitation = [48, 49]
-
-        meals = [f'x{m}' for m in meals]
-        market = [f'x{m}' for m in market]
-        transports = [f'x{m}' for m in transports]
-        internet = [f'x{m}' for m in internet]
-        habitation = [f'x{m}' for m in habitation]
-
         costs = {
-        'Meals' : ((country_data['x1'] + country_data['x2']/2 + country_data['x3']) / 3).values[0] * 2,
-        'Market' : country_data[market].mean(axis=0).values[0],
-        'Transports' : country_data[transports].mean(axis=0).values[0] * 3,
-        'Telecommunications' : country_data[internet].mean(axis=0).values[0],
-        'Accomodation' : country_data[habitation].mean(axis=0).values[0] / 30.437
+        'Meals' : country_data['meals'].values[0],#((country_data['x1'] + country_data['x2']/2 + country_data['x3']) / 3).values[0] * 2,
+        'Market' : country_data['market'].values[0], #country_data[market].mean(axis=0).values[0],
+        'Transports' : country_data['transports'].values[0],# country_data[transports].mean(axis=0).values[0] * 3,
+        'Telecommunications' : country_data['telecommunications'].values[0],#country_data[internet].mean(axis=0).values[0],
+        'Habitation' : country_data['accomodation'].values[0],#country_data[habitation].mean(axis=0).values[0] / 30.437
         }
 
         values = list(costs.values())
@@ -620,10 +610,11 @@ def back_callback(back):
     Output('map_slider', 'max'),
     Output('map_slider', 'value'),
     Output('map_slider', 'step'),
-    Input('map_variable','value'))
-def back_callback(value):
-    path = os.path.join('data', 'dataset_alpha.csv')
-    data = pd.read_csv(path)
+    Input('map_variable','value'), Input('data_all', 'data'))
+def back_callback(value, json_data):
+    # path = os.path.join('data', 'dataset_alpha.csv')
+    # data = pd.read_csv(path)
+    data = pd.read_json(json_data, orient='split')
     
     min = data[value].min()
     max = data[value].max()
