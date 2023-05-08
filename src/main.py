@@ -337,6 +337,10 @@ def map_view(button1_clicks, button2_clicks,button3_clicks, button4_clicks, butt
 )
 def display_average_by_country(json_data, map_variable):
     data = pd.read_json(json_data, orient='split')
+    print("?")
+    options = [    {'label': 'Higher Cost', 'value': 'average_cost_rich'},    {'label': 'Medium Cost', 'value': 'average_cost_medium'},    {'label': 'Lowest Cost', 'value': 'average_cost_lower'},    {'label': 'Security Index', 'value': 'safety_index'},    {'label': 'Quality Index', 'value': 'quality_of_life'},    {'label': 'UNESCO Properties', 'value': 'unesco_props'},    {'label': 'GDP', 'value': 'GDP'},    {'label': 'Population', 'value': 'total_population'}]
+    label = next((o['label'] for o in options if o['value'] == map_variable), None)
+    print(label)
 
     continent_data = data.groupby('continent').mean(numeric_only=True).reset_index()
 
@@ -364,7 +368,7 @@ def display_average_by_country(json_data, map_variable):
         height=400,
     )
 
-    fig.update_yaxes(title_text=map_variable)
+    fig.update_yaxes(title_text=label)
     return fig
 
 @app.callback(
