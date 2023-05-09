@@ -19,6 +19,7 @@ app.config.prevent_initial_callbacks = 'initial_duplicate'
 app.layout = html.Div(
     className = 'main_page',
     children = [
+        html.Div(id='popup-container'),
         html.Div(
             dbc.Row(
             [
@@ -94,7 +95,6 @@ app.layout = html.Div(
                 )
             ]
         )),
-        
         dcc.Store(id='intermediate-value'),
         dcc.Store(id='button_value'),
         dcc.Store(id='filters-data', data={
@@ -580,6 +580,7 @@ def get_info_graph(data, country, variable, display_name, ticks_range, ticks_nam
 def get_side_bar():
     children=[
                 dbc.Button('Reset', color='secondary', className="me-1 button_class", id='filters-selected', n_clicks=0),
+                dbc.Button('Click me to open pop-up',color='secondary', id='popup-button'),
                 html.Div(id='filters-info'),
                 dcc.Graph(id='cost_by_continent'),
                 html.Div(
@@ -646,5 +647,37 @@ def back_callback(value):
     return min, max+1, [min,max], 1
     
 
+@app.callback(Output('popup-container', 'children', allow_duplicate=True),
+              [Input('popup-button', 'n_clicks')])
+def show_popup(n_clicks):
+    #if n_clicks % 2 == 0:#
+    if n_clicks is not None:
+        return html.Div(
+            id='popup',
+            className='popup',
+            children=[
+                html.Div(
+                    className='popup-content',
+                    children=[
+                        html.H3('If you have some questions, this will try to answer it!'),
+                        html.H4('Where did this data came from?'),
+                        html.P('A dataset was created with multiple sources such as UNESCO, Kaggle, Numbeo website ...'),
+                        html.H4('What is the Higher, Medium and Lowest cost??'),
+                        html.P('To get a better ideia of the cost of visiting a country, these 3 catefories were made by choosing tree ways to visit for example: staying in the center of the city or outside.'),
+                        dbc.Button('Close', id='close-popup-button')
+                    ]
+                ),
+                html.Div(className='popup-overlay')
+            ]
+        )
+    
+@app.callback(Output('popup-container', 'children', allow_duplicate=True),
+              [Input('close-popup-button', 'n_clicks')])
+def hide_popup(n_clicks):
+    if n_clicks is not None:
+        return None
+    else:
+        return dash.no_update
+    
 if __name__ == '__main__':
     app.run_server(debug=True)
