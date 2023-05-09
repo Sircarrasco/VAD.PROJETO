@@ -43,18 +43,22 @@ app.layout = html.Div(
                             ),
                         html.Div(
                             id='map_variable_container',
-                            children=[dcc.Dropdown(
-                                id='map_variable',
-                                options = [
-                                    {'label' : l, 'value' : v}
-                                    for l, v in zip(
-                                        ['Higher Cost', 'Medium Cost', 'Lowest Cost', 'Security Index', 'Quality Index', 'UNESCO Properties', 'GDP', 'Population'],
-                                        ['average_cost_rich', 'average_cost_medium', 'average_cost_lower', 'safety_index', 'quality_of_life', 'unesco_props', 'GDP', 'total_population']
-                                    )
-                                ],
-                                clearable = False,
-                                value='average_cost_medium'
-                            )]
+                            children=[
+                                dbc.Row([
+                                    dbc.Col(html.P(children = "Select a categorie: ", id="variable_text", style = {'textAlign': 'center'}),),
+                                    dbc.Col(dcc.Dropdown(
+                                            id='map_variable',
+                                            options = [
+                                                {'label' : l, 'value' : v}
+                                                for l, v in zip(
+                                                    ['Higher Cost', 'Medium Cost', 'Lowest Cost', 'Security Index', 'Quality of Life Index', 'UNESCO Properties', 'GDP', 'Population'],
+                                                    ['average_cost_rich', 'average_cost_medium', 'average_cost_lower', 'safety_index', 'quality_of_life', 'unesco_props', 'GDP', 'total_population']
+                                                )
+                                            ],
+                                            clearable = False,
+                                            value='average_cost_medium'
+                            ))]),
+                            ]
                         ),
 
                         dcc.Graph(id="map-graph"),
@@ -73,7 +77,8 @@ app.layout = html.Div(
                                 html.Div(id='no_data'),
                                 html.P('No data available', id='no_data_text')
                             ]
-                        )
+                        ),
+                        html.P("The above label goes from the lowest value(left one) to the highest (right value) and it has a blue slider on top of it, if draged it will filter the data.",id="label_text"),
                         ],
                     
                 ),
@@ -100,10 +105,7 @@ app.layout = html.Div(
             'total_population' : [1.120400e+04, 1.412360e+09]
         }),
         dcc.Store(id='data-all', data=pd.read_csv(os.path.join('data', 'dataset_alpha.csv')).to_json(date_format='iso', orient='split')),
-    ],
-    style={
-        "margin-bottom": "-50px"
-    }
+    ]
 )
 
 
@@ -150,6 +152,7 @@ def show_filters(n_clicks, filter_data):
     display='block'
     content = html.Div(
         children=[
+            html.P("Drag the bellow sliders to filter the data."),
             html.Div(
                 className='filter_item',
                 children=[
@@ -165,7 +168,7 @@ def show_filters(n_clicks, filter_data):
             html.Div(
                 className='filter_item',
                 children=[
-                    html.P('Quality Index', className='filter_sec'),
+                    html.P('Quality of Life Index', className='filter_sec'),
                     dcc.RangeSlider(
                         min=0, max=100,
                         value = filter_data['quality_index'],
@@ -189,7 +192,7 @@ def show_filters(n_clicks, filter_data):
             html.Div(
             className ='filter_item',
             children=[
-                html.P('GDP',className='filter_sec'),
+                html.P('Gross domestic product (GDP)',className='filter_sec'),
                 dcc.RangeSlider(
                     min=0.04, max=17420,
                     value = filter_data['GDP'],
@@ -290,12 +293,13 @@ def map_view(button1_clicks, button2_clicks,button3_clicks, button4_clicks, butt
         'safety_index' : [16, 87],
         'quality_of_life' : [33, 88],
         'unesco_props' : [0, 58],
-        'GDP' : [0, 17420],
+        'GDP' : [0, 17421],
         'total_population' : [11204, 1412360000.0]
     }
 
 
     aux_data = aux_data.loc[ (aux_data[map_variable] <= map_slider[1]) & (aux_data[map_variable] >= map_slider[0])]
+
     fig = px.choropleth(data_frame      = aux_data,
                         locations       = 'code',
                         locationmode    = 'ISO-3',
@@ -337,10 +341,18 @@ def map_view(button1_clicks, button2_clicks,button3_clicks, button4_clicks, butt
 )
 def display_average_by_country(json_data, map_variable):
     data = pd.read_json(json_data, orient='split')
-    print("?")
-    options = [    {'label': 'Higher Cost', 'value': 'average_cost_rich'},    {'label': 'Medium Cost', 'value': 'average_cost_medium'},    {'label': 'Lowest Cost', 'value': 'average_cost_lower'},    {'label': 'Security Index', 'value': 'safety_index'},    {'label': 'Quality Index', 'value': 'quality_of_life'},    {'label': 'UNESCO Properties', 'value': 'unesco_props'},    {'label': 'GDP', 'value': 'GDP'},    {'label': 'Population', 'value': 'total_population'}]
+    options = [
+                {'label': 'Higher Cost', 'value': 'average_cost_rich'},
+                {'label': 'Medium Cost', 'value': 'average_cost_medium'},
+                {'label': 'Lowest Cost', 'value': 'average_cost_lower'}, 
+                {'label': 'Security Index', 'value': 'safety_index'}, 
+                {'label': 'Quality of Life Index', 'value': 'quality_of_life'}, 
+                {'label': 'UNESCO Properties', 'value': 'unesco_props'},  
+                {'label': 'GDP', 'value': 'GDP'},  
+                {'label': 'Population', 'value': 'total_population'}
+            ]
+    
     label = next((o['label'] for o in options if o['value'] == map_variable), None)
-    print(label)
 
     continent_data = data.groupby('continent').mean(numeric_only=True).reset_index()
 
@@ -460,7 +472,7 @@ def display_click_data(clickData,content,map_variable, json_data):
             title_text = 'Age'
         )
         fig.update_yaxes(
-            title_text = 'Percentage of the population',
+            title_text = 'Population',
         )
         
         country_data = data[data.country == country]
@@ -486,7 +498,7 @@ def display_click_data(clickData,content,map_variable, json_data):
 
         fig2.update_layout(
             title = dict(
-                text = '% of each cost for the total value',
+                text = 'Percentage of each cost for the total value',
                 x = 0.5,
                 y=0.85
             ),
@@ -621,16 +633,17 @@ def back_callback(back):
     Output('map_slider', 'max'),
     Output('map_slider', 'value'),
     Output('map_slider', 'step'),
-    Input('map_variable','value'), Input('data_all', 'data'))
-def back_callback(value, json_data):
-    # path = os.path.join('data', 'dataset_alpha.csv')
-    # data = pd.read_csv(path)
-    data = pd.read_json(json_data, orient='split')
+    Input('map_variable','value')#, Input('data_all', 'data'))
+    )
+def back_callback(value):
+    path = os.path.join('data', 'dataset_alpha.csv')
+    data = pd.read_csv(path)
+    #data = pd.read_json(json_data, orient='split')
     
     min = data[value].min()
     max = data[value].max()
 
-    return min, max, [min,max], 1
+    return min, max+1, [min,max], 1
     
 
 if __name__ == '__main__':
