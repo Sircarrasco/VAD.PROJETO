@@ -1,5 +1,5 @@
 from dash import Dash, dcc, html
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 from dash_extensions.enrich import MultiplexerTransform
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
@@ -429,7 +429,7 @@ def display_scatter(y_var, x_var, json_data):
     Output('side_menu', 'children' , allow_duplicate=True),
     [Input('map-graph', 'clickData'),
     Input('side_menu', 'style'),
-    Input('map_variable','value'), Input('data-all', 'data')]
+    State('map_variable','value'), Input('data-all', 'data')]
 )
 def display_click_data(clickData,content,map_variable, json_data):
     
@@ -702,4 +702,4 @@ def hide_popup(n_clicks):
         return dash.no_update
     
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)
