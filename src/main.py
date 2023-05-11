@@ -46,7 +46,7 @@ app.layout = html.Div(
                             id='map_variable_container',
                             children=[
                                 dbc.Row([
-                                    dbc.Col(html.P(children = "Select a categorie: ", id="variable_text", style = {'textAlign': 'center'}),),
+                                    dbc.Col(html.P(children = "Select a category: ", id="variable_text", style = {'textAlign': 'center'}),),
                                     dbc.Col(dcc.Dropdown(
                                             id='map_variable',
                                             options = [
@@ -580,7 +580,7 @@ def get_info_graph(data, country, variable, display_name, ticks_range, ticks_nam
 def get_side_bar():
     children=[
                 dbc.Button('Reset', color='secondary', className="me-1 button_class", id='filters-selected', n_clicks=0),
-                dbc.Button('Click me to open pop-up',color='secondary', id='popup-button'),
+                dbc.Button('Frequent questions',color='secondary', id='popup-button'),
                 html.Div(id='filters-info'),
                 dcc.Graph(id='cost_by_continent'),
                 html.Div(
