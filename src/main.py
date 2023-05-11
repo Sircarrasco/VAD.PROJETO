@@ -27,8 +27,9 @@ app.layout = html.Div(
                     id = 'main_menu',
                     width = 8,
                     children = [
-                        html.H1(children = "Travel destination selection dashboard", id="title",
+                        html.H1(children = "PickSetGo", id="title",
                         style = {'textAlign': 'center'}),
+                        html.H2('Travel Destination Selection Dashboard', id="subtitle", style = {'textAlign': 'center'}),
 
                         html.Div(
                                 children=[
@@ -152,7 +153,7 @@ def show_filters(n_clicks, filter_data):
     display='block'
     content = html.Div(
         children=[
-            html.P("Drag the bellow sliders to filter the data."),
+            html.P("Drag the bellow sliders to filter the data.", id='label_text_side'),
             html.Div(
                 className='filter_item',
                 children=[
@@ -298,6 +299,16 @@ def map_view(button1_clicks, button2_clicks,button3_clicks, button4_clicks, butt
     }
 
 
+    prefix = ""
+    if map_variable in ["average_cost_rich","average_cost_medium","average_cost_lower"]:
+        prefix = "$ "
+    elif map_variable in ["quality_of_life","safety_index","average_cost_lower"]:
+        prefix = "% "
+    elif map_variable == 'GDP':
+        prefix = "B "
+    elif map_variable == 'unesco_props':
+        prefix = "No. "   
+        
     aux_data = aux_data.loc[ (aux_data[map_variable] <= map_slider[1]) & (aux_data[map_variable] >= map_slider[0])]
 
     fig = px.choropleth(data_frame      = aux_data,
@@ -324,12 +335,14 @@ def map_view(button1_clicks, button2_clicks,button3_clicks, button4_clicks, butt
             lenmode='fraction',
             len=0.93,
             ticks='outside',
+            tickprefix=prefix,
             # tickvals=min_max_values[map_variable],
             # ticktext=['Low', 'High'],
             # dtick=2
         ),
         
     )
+
     # Disable hover effects
     fig.data[0].hovertemplate = None
 
@@ -398,13 +411,11 @@ def display_scatter(y_var, x_var, json_data):
     continent_colors = {'Asia': '#FF5733', 'Europe': '#FFC300', 'Africa': '#DAF7A6', 'South America': '#C70039',"North America": "#30426A" ,'Oceania': '#900C3F'}
     marker_colors = [continent_colors[continent] if continent in continent_colors else 'black' for continent in df['continent']]
 
-    fig = px.scatter(df, y=y_var, x=x_var, color='continent', color_discrete_sequence=px.colors.qualitative.G10)
+    fig = px.scatter(df, y=y_var, x=x_var, hover_data=['country'], color='continent', color_discrete_sequence=px.colors.qualitative.G10)
     fig.update_layout(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
         height=400,
-
-        
      )
     fig.update_xaxes(
         title_text= labels_map[x_var]
@@ -518,18 +529,20 @@ def display_click_data(clickData,content,map_variable, json_data):
             data["oposite_rank"] = data[map_variable].rank(ascending=False)
             rank = data.loc[data["country"] == country, "oposite_rank"].values[0]
         children=[
-            dbc.Button("Back", color='secondary', className="w-5 me-1 button_class", id="back", style = {"display": "block"}, value = "no"),
+            dbc.Button( color='secondary', className="w-5 me-1 button_class", id="back", value = "no",
+                        children=html.Img(src='assets/back-button.png', style={'height': '30px'}),
+                        style={'background-color': 'transparent', 'border': 'none'}),
             html.Div(id='country_header', children=[
                 html.H1(country, id="country_name"),
-                html.H3(f'#{int(rank)} / {len(data)}', id="rank"),
+                html.H5(f'Rank: {int(rank)} / {len(data)}', id="rank"),
             ]),
-            html.P(children='Daily Cost', className='country_info_item'),
+            html.P(children='DAILY COST', className='country_info_item'),
             dcc.Graph(figure=cost),
             html.P(children='QUALITY OF LIFE', className='country_info_item'),
             dcc.Graph(figure=quality_of_index),
             html.P('SECURITY INDEX', className='country_info_item'),
             dcc.Graph(figure=security_index),
-            html.P('GDP', className='country_info_item'),
+            html.P('GROSS DOMESTIC PRODUCT (GDP)', className='country_info_item'),
             dcc.Graph(figure=gdp),
             dcc.Graph(id='population_plot', figure = fig),
             dcc.Graph(id='population_plot2', figure = fig2),
@@ -579,8 +592,11 @@ def get_info_graph(data, country, variable, display_name, ticks_range, ticks_nam
 
 def get_side_bar():
     children=[
-                dbc.Button('Reset', color='secondary', className="me-1 button_class", id='filters-selected', n_clicks=0),
-                dbc.Button('Frequent questions',color='secondary', id='popup-button'),
+                html.Div(id='side-header', children=[
+                        dbc.Button('Reset', color='secondary', className="me-1 button_class", id='filters-selected', n_clicks=0),
+                        dbc.Button(id='popup-button',
+                            children=html.Img(src='assets/question.png', style={'height': '30px'}),
+                            style={'background-color': 'transparent', 'border': 'none'}),]),
                 html.Div(id='filters-info'),
                 dcc.Graph(id='cost_by_continent'),
                 html.Div(
@@ -661,10 +677,16 @@ def show_popup(n_clicks):
                     children=[
                         html.H3('If you have some questions, this will try to answer it!'),
                         html.H4('Where did this data came from?'),
-                        html.P('A dataset was created with multiple sources such as UNESCO, Kaggle, Numbeo website ...'),
-                        html.H4('What is the Higher, Medium and Lowest cost??'),
-                        html.P('To get a better ideia of the cost of visiting a country, these 3 catefories were made by choosing tree ways to visit for example: staying in the center of the city or outside.'),
-                        dbc.Button('Close', id='close-popup-button')
+                        html.P('A dataset was created with multiple sources such as UNESCO, World Bank, Kaggle, Numbeo website ...'),
+                        html.H4('What is the Higher, Medium and Lowest cost?'),
+                        html.P('To get a better idea of the cost of visiting a country, these 3 categories were made by choosing tree ways to visit.'),
+                        html.H5('Higher Cost'),
+                        html.P(' 2 Meals in a mid-range Restaurant with a wine bottle + Apartment with 1 bedroom in the city center + Taxi tariff + 60 min of pre-paid mobile tariff + 60MB of mobile data + Cappuccino + 1.5L Water Bottle'),
+                        html.H5('Medium Cost'),
+                        html.P('2 Meals at a fast-food restaurant with a domestic beer + Apartment with 1 bedroom in the city surroundings + One-way ticket at local transports + 30 min of pre-paid mobile tariff + 60MB of mobile data + Cappuccino + 1.5L Water Bottle'),
+                        html.H5('Lowest Cost'),
+                        html.P('2 Meals at inexpensive restaurant with a water bottle + Apartment with 1 bedroom in the city surroundings + 10 min of pre-paid mobile tariff + 1.5L Water Bottle'),
+                        dbc.Button('Close', color="secondary", id='close-popup-button', className="me-1 button_class",)
                     ]
                 ),
                 html.Div(className='popup-overlay')
