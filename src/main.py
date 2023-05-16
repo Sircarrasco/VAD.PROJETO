@@ -402,8 +402,8 @@ def display_average_by_country(json_data, map_variable):
 )
 def display_scatter(y_var, x_var, json_data):
     df = pd.read_json(json_data, orient='split')
-    labels = ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties']
-    variables = ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props']
+    labels = ['Higher Cost', 'Medium Cost', 'Lowest Cost', 'Security Index', 'Quality of Life Index', 'UNESCO Properties', 'GDP', 'Population']
+    variables = ['average_cost_rich', 'average_cost_medium', 'average_cost_lower', 'safety_index', 'quality_of_life', 'unesco_props', 'GDP', 'total_population']
     labels_map = {}
     for l, v in zip(labels, variables):
         labels_map[v] = l
@@ -612,8 +612,9 @@ def get_side_bar():
                                     id = 'x_variable',
                                     options = [{'label' : l, 'value': v} 
                                                 for l, v in zip(
-                                                    ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
-                                                    ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
+                                                    ['Higher Cost', 'Medium Cost', 'Lowest Cost', 'Security Index', 'Quality of Life Index', 'UNESCO Properties', 'GDP', 'Population'],
+                                                    ['average_cost_rich', 'average_cost_medium', 'average_cost_lower', 'safety_index', 'quality_of_life', 'unesco_props', 'GDP', 'total_population']
+                                                )],
                                     value = 'quality_of_life',
                                     clearable=False
                                 ),
@@ -622,8 +623,9 @@ def get_side_bar():
                                     id = 'y_variable',
                                     options = [{'label' : l, 'value': v} 
                                                 for l, v in zip(
-                                                    ['Security', 'Quality Index','Total Population', 'GDP', 'Unesco Properties'], 
-                                                    ['safety_index', 'quality_of_life', 'total_population', 'GDP', 'unesco_props'])],
+                                                    ['Higher Cost', 'Medium Cost', 'Lowest Cost', 'Security Index', 'Quality of Life Index', 'UNESCO Properties', 'GDP', 'Population'],
+                                                    ['average_cost_rich', 'average_cost_medium', 'average_cost_lower', 'safety_index', 'quality_of_life', 'unesco_props', 'GDP', 'total_population']
+                                                )],
                                     value = 'safety_index',
                                     clearable=False
                                 )
