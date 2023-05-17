@@ -1,3 +1,10 @@
+"""
+    Authors:
+        - Joana Simões
+        - Pedro Carrasco
+"""
+
+
 from dash import Dash, dcc, html
 from dash.dependencies import Input, Output, State
 from dash_extensions.enrich import MultiplexerTransform
